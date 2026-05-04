@@ -1,0 +1,241 @@
+---
+import Base from "../../layouts/Base.astro";
+import BrutalNav from "../../components/BrutalNav.astro";
+import BrutalFooter from "../../components/BrutalFooter.astro";
+import Marquee from "../../components/Marquee.astro";
+import ToolMock from "../../components/ToolMock.astro";
+import { TOOLS, TOOL_BY_SLUG } from "../../data/tools";
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return TOOLS.map((t) => ({ params: { slug: t.slug } }));
+}
+
+const { slug } = Astro.params;
+const tool = TOOL_BY_SLUG[slug as keyof typeof TOOL_BY_SLUG];
+if (!tool) {
+  return Astro.redirect("/");
+}
+const peers = TOOLS.filter((t) => t.slug !== tool.slug);
+const accent = tool.color;
+---
+
+<Base
+  title={`${tool.name} — Steven Johnston`}
+  description={tool.blurb}
+  accent={accent}
+>
+  <BrutalNav current="work" accent={accent} />
+
+  {/* hero */}
+  <section class="px-5 pt-10 md:px-10">
+    <a href="/" class="text-xs font-bold tracking-[0.15em]">← BACK TO WORK</a>
+    <div
+      class="mt-5 brutal-eyebrow uppercase"
+      style={{ color: accent }}
+    >
+      № {tool.n} · {tool.tag} · {tool.year}
+    </div>
+    <h1
+      class="brutal-h1 mt-3 mb-5 text-[72px] sm:text-[112px] md:text-[148px] lg:text-[168px]"
+    >
+      {tool.name}.
+    </h1>
+    <p class="mb-10 max-w-[880px] text-[20px] font-medium leading-snug [text-wrap:pretty] md:text-[22px]">
+      {tool.blurb}
+    </p>
+  </section>
+
+  {/* hero screenshot */}
+  <section class="px-5 pb-10 md:px-10">
+    <div
+      class="border-2 border-ink shadow-brutal-lg overflow-hidden"
+      style={{ background: accent }}
+    >
+      <div class="relative aspect-[16/9]">
+        <div class="absolute inset-6">
+          <ToolMock slug={tool.slug} accent={accent} />
+        </div>
+      </div>
+    </div>
+    <div class="mt-3 text-[11px] font-semibold uppercase tracking-wider opacity-55">
+      FIG. 01 · STYLISED PREVIEW · DROP REAL CAPTURE HERE
+    </div>
+  </section>
+
+  {/* meta strip */}
+  <section
+    class="grid grid-cols-2 border-y-2 border-ink bg-ink text-cream md:grid-cols-4"
+  >
+    {[
+      ["CLIENT", tool.client],
+      ["DURATION", tool.duration],
+      ["ROLE", tool.role],
+      ["STATUS", tool.status],
+    ].map(([k, v], i) => (
+      <div
+        class={`px-6 py-5 ${i % 2 === 0 ? "border-r border-cream/20" : "md:border-r md:border-cream/20"} ${i < 2 ? "border-b border-cream/20 md:border-b-0" : ""}`}
+      >
+        <div
+          class="brutal-eyebrow uppercase"
+          style={{ color: accent }}
+        >{k}</div>
+        <div class="mt-1.5 text-[15px] font-semibold">{v}</div>
+      </div>
+    ))}
+  </section>
+
+  {/* problem */}
+  <section class="grid gap-10 px-5 pb-10 pt-16 md:grid-cols-[300px_1fr] md:px-10 md:pt-20">
+    <h2 class="text-5xl font-extrabold leading-[0.95] tracking-crush md:text-[56px]">
+      THE<br />PROBLEM.
+    </h2>
+    <p class="max-w-[820px] pt-1 text-[19px] font-medium leading-relaxed [text-wrap:pretty]">
+      {tool.problem}
+    </p>
+  </section>
+
+  {/* approach */}
+  <section
+    class="border-y-2 border-ink px-5 py-12 md:px-10"
+    style={{ background: accent }}
+  >
+    <div class="grid gap-10 md:grid-cols-[300px_1fr]">
+      <h2 class="text-5xl font-extrabold leading-[0.95] tracking-crush md:text-[56px]">
+        THE<br />APPROACH.
+      </h2>
+      <div class="flex flex-col gap-4">
+        {tool.approach.map((step, i) => (
+          <div
+            class={`grid grid-cols-[60px_1fr] items-start gap-5 ${
+              i < tool.approach.length - 1 ? "border-b-[1.5px] border-ink/25 pb-4" : ""
+            }`}
+          >
+            <div class="text-[36px] font-extrabold leading-none tracking-tight">
+              {String(i + 1).padStart(2, "0")}
+            </div>
+            <p class="pt-1 text-[16px] font-medium leading-snug [text-wrap:pretty] md:text-[17px]">
+              {step}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* secondary screenshots */}
+  <section class="px-5 py-14 md:px-10">
+    <div class="mb-5 brutal-eyebrow uppercase">SELECTED VIEWS ↓</div>
+    <div class="grid gap-6 md:grid-cols-2">
+      {[1, 2].map((i) => (
+        <div>
+          <div
+            class="border-2 border-ink shadow-brutal-sm overflow-hidden"
+            style={{ background: accent }}
+          >
+            <div class="relative aspect-[16/10]">
+              <div class="absolute inset-4">
+                <ToolMock slug={tool.slug} accent={accent} dim={i === 2} />
+              </div>
+            </div>
+          </div>
+          <div class="mt-2.5 text-[11px] font-semibold uppercase tracking-wider opacity-55">
+            FIG. {String(i + 1).padStart(2, "0")} · PLACEHOLDER
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {/* outcome */}
+  <section class="bg-ink px-5 py-14 text-cream md:px-10">
+    <h2 class="brutal-h2 mb-7">
+      THE OUTCOME <span style={{ color: accent }}>↓</span>
+    </h2>
+    <div class="grid grid-cols-1 border border-cream/20 sm:grid-cols-3">
+      {tool.outcome.map(([metric, value, delta], i) => (
+        <div
+          class={`px-7 py-8 ${
+            i < tool.outcome.length - 1 ? "border-b border-cream/20 sm:border-b-0 sm:border-r" : ""
+          }`}
+        >
+          <div
+            class="brutal-eyebrow uppercase"
+            style={{ color: accent }}
+          >{metric}</div>
+          <div class="mt-3 text-[36px] font-extrabold leading-none tracking-tight md:text-[44px]">
+            {value}
+          </div>
+          {delta && delta !== "—" && delta !== "–" && (
+            <div class="mt-2 text-sm font-semibold text-cream/60">{delta}</div>
+          )}
+        </div>
+      ))}
+    </div>
+    <blockquote
+      class="mt-9 max-w-[880px] border-l-4 pl-5 text-xl font-medium italic leading-snug [text-wrap:pretty] md:text-2xl"
+      style={{ borderColor: accent }}
+    >
+      {tool.quote}
+    </blockquote>
+  </section>
+
+  {/* stack */}
+  <section class="grid items-center gap-10 px-5 py-12 md:grid-cols-[300px_1fr] md:px-10">
+    <h2 class="text-3xl font-extrabold tracking-tight md:text-4xl">BUILT WITH.</h2>
+    <div class="flex flex-wrap gap-2">
+      {tool.stack.map((s) => (
+        <span class="brutal-pill">{s}</span>
+      ))}
+    </div>
+  </section>
+
+  {/* links */}
+  <section class="border-t-2 border-ink px-5 py-10 md:px-10">
+    <div class="flex flex-wrap gap-3">
+      <a
+        href={tool.github}
+        target="_blank"
+        rel="noopener"
+        class="brutal-link-cta"
+      >GITHUB ↗</a>
+      {tool.liveUrl && tool.liveUrl !== tool.github && (
+        <a
+          href={tool.liveUrl}
+          target="_blank"
+          rel="noopener"
+          class="border-2 border-ink bg-cream px-4 py-2 text-xs font-bold tracking-[0.1em] hover:bg-accent"
+        >LIVE → {new URL(tool.liveUrl).hostname} ↗</a>
+      )}
+    </div>
+  </section>
+
+  {/* peer projects */}
+  <section class="border-t-2 border-ink px-5 py-12 md:px-10">
+    <div class="mb-5 brutal-eyebrow uppercase">NEXT PROJECTS ↓</div>
+    <div class="grid gap-6 md:grid-cols-3">
+      {peers.map((p) => (
+        <a
+          href={`/tools/${p.slug}`}
+          class="tile-lift-sm grid grid-cols-[1fr_auto] items-stretch border-2 border-ink shadow-brutal-sm bg-cream"
+        >
+          <div class="px-6 py-5">
+            <div
+              class="brutal-eyebrow uppercase"
+              style={{ color: p.color }}
+            >№ {p.n} · {p.tag}</div>
+            <div class="mt-1.5 text-2xl font-extrabold tracking-tight">{p.name}</div>
+            <p class="mt-2 text-[13px] leading-snug text-[#444]">{p.blurb.slice(0, 120)}{p.blurb.length > 120 ? "…" : ""}</p>
+          </div>
+          <div
+            class="flex items-center px-6 text-3xl font-extrabold"
+            style={{ background: p.color }}
+          >↗</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <BrutalFooter accent={accent} />
+</Base>

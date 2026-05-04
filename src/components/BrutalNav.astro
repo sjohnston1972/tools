@@ -1,0 +1,52 @@
+---
+interface Props {
+  current?: "work" | "process" | "stack" | "about";
+  accent?: string;
+}
+const { current = "work", accent = "#ff5b1f" } = Astro.props;
+
+const links = [
+  { id: "work",    label: "WORK",    href: "/#work" },
+  { id: "process", label: "PROCESS", href: "/#process" },
+  { id: "stack",   label: "STACK",   href: "/#stack" },
+  { id: "about",   label: "ABOUT",   href: "/#about" },
+];
+---
+
+<header
+  class="sticky top-0 z-40 flex items-center justify-between border-b-2 border-ink bg-cream px-5 py-4 md:px-10"
+>
+  <a
+    href="/"
+    class="flex items-center gap-2.5 text-lg font-extrabold tracking-tight md:text-xl"
+  >
+    <span
+      class="inline-block h-5 w-5 md:h-[22px] md:w-[22px]"
+      style={{ background: accent }}
+      aria-hidden="true"
+    ></span>
+    STEVEN.JOHNSTON
+  </a>
+
+  <nav class="flex items-center gap-1 md:gap-1">
+    {links.map((l) => (
+      <a
+        href={l.href}
+        class={`hidden md:inline-block px-3 py-1.5 text-xs font-bold tracking-[0.1em] border-b-2 ${
+          current === l.id ? "" : "border-transparent"
+        }`}
+        style={current === l.id ? { borderColor: accent } : {}}
+      >
+        {l.label}
+      </a>
+    ))}
+    <a
+      href="https://clydeford.net"
+      class="brutal-link-cta ml-2"
+      target="_blank"
+      rel="noopener"
+    >
+      ABOUT ME ↗
+    </a>
+  </nav>
+</header>

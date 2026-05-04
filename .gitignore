@@ -1,0 +1,33 @@
+# deps
+node_modules/
+
+# build output
+dist/
+.astro/
+.wrangler/
+
+# env / secrets
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+
+# editor
+.vscode/
+.idea/
+
+# os
+.DS_Store
+Thumbs.db
+
+# extraction artifacts (Claude Design template decoder output)
+_extracted/
+extracted/
+extract-design.mjs
+
+# logs
+*.log
+npm-debug.log*
+
+# cloudflare types
+worker-configuration.d.ts

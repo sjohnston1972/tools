@@ -1,0 +1,130 @@
+---
+import Base from "../layouts/Base.astro";
+import BrutalNav from "../components/BrutalNav.astro";
+import BrutalFooter from "../components/BrutalFooter.astro";
+import Marquee from "../components/Marquee.astro";
+import ToolTile from "../components/ToolTile.astro";
+import { TOOLS } from "../data/tools";
+
+const accent = "#ff5b1f";
+---
+
+<Base title="Steven Johnston — AI Tools Showcase" accent={accent}>
+  <BrutalNav current="work" accent={accent} />
+
+  {/* hero */}
+  <section class="grid items-end gap-10 px-5 pt-12 pb-8 md:grid-cols-[1fr_auto] md:px-10 md:pt-16">
+    <div>
+      <span
+        class="mb-5 inline-block bg-ink px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.15em] text-cream"
+      >
+        [001] AI TOOLS · MMXXVI
+      </span>
+      <h1 class="brutal-h1 text-[52px] sm:text-[72px] md:text-[96px] lg:text-[112px]">
+        <span class="block">BUILDING</span>
+        <span class="my-3 block md:my-4">
+          <span
+            class="inline-block bg-accent px-4 py-1 text-ink shadow-brutal-stamp"
+            style="transform: rotate(-1deg)"
+          >SMART TOOLS</span>
+        </span>
+        <span class="block">FOR NETWORK<br class="md:hidden" /> ENGINEERS.</span>
+      </h1>
+    </div>
+    <aside class="w-full max-w-[260px] pb-2">
+      <div class="brutal-card-sm p-4">
+        <div class="brutal-eyebrow mb-1.5" style={{ color: accent }}>STATUS</div>
+        <div class="text-[14px] font-semibold leading-snug">
+          Four tools live.<br />
+          Built nights, weekends, and the gaps between datacentre cutovers.
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="px-5 pb-12 md:px-10">
+    <p class="max-w-[760px] text-[18px] font-medium leading-relaxed [text-wrap:pretty]">
+      Internal-shaped tools that fold AI into the spots where network engineers lose hours.
+      <span class="bg-highlight px-1">
+        Auditors that cite the control they break. Terminals that pair-program. API consoles that fetch live docs. Digital twins that propose the fix and wait for your nod.
+      </span>
+    </p>
+  </section>
+
+  {/* tools */}
+  <section id="work" class="px-5 pb-10 pt-16 md:px-10 md:pt-20">
+    <header class="mb-9 flex items-baseline justify-between border-b-2 border-ink pb-3.5">
+      <h2 class="brutal-h2">TOOLS.</h2>
+      <span class="text-sm font-semibold">04 of 04 ↓</span>
+    </header>
+    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      {TOOLS.map((tool) => <ToolTile tool={tool} />)}
+    </div>
+  </section>
+
+  {/* process */}
+  <section id="process" class="bg-ink px-5 py-14 text-cream md:px-10">
+    <h2 class="brutal-h2 mb-9">
+      HOW I BUILD <span style={{ color: accent }}>↓</span>
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      {[
+        ["LIVE THE PAIN", "I'm a network engineer first. Every tool here exists because I needed it on a Friday at 17:30."],
+        ["UGLY V0", "Real data, real auth, in days — not weeks. Click the thing before the kickoff meeting ends."],
+        ["EARN THE LLM", "Where does the model actually pay rent? Build both paths. Let the workflow decide."],
+        ["SHIP, OBSERVE, LEAVE", "Boring deploy. Documented. Measured. Forget I was here."],
+      ].map(([h, b], i) => (
+        <div
+          class="border-cream/20 px-6 py-7 sm:border-r-[1px] [&:nth-child(2n)]:sm:border-r-0 lg:[&:nth-child(2n)]:sm:border-r-[1px] lg:[&:last-child]:border-r-0"
+        >
+          <div
+            class="text-[80px] font-extrabold leading-none tracking-smash"
+            style={{ color: accent }}
+          >{String(i + 1).padStart(2, "0")}</div>
+          <div class="mt-3 text-xl font-extrabold tracking-tight">{h}</div>
+          <p class="mt-2.5 text-[13.5px] leading-relaxed text-cream/70 [text-wrap:pretty]">{b}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <Marquee
+    text="PYTHON · TYPESCRIPT · CLOUDFLARE · CLAUDE · DEEPSEEK · OLLAMA · LANGGRAPH · MCP · DOCKER · PYATS"
+    variant="cream"
+  />
+
+  {/* stack */}
+  <section id="stack" class="px-5 py-14 md:px-10">
+    <h2 class="text-3xl font-extrabold tracking-tight md:text-4xl">STACK I REACH FOR.</h2>
+    <div class="mt-6 flex flex-wrap gap-2">
+      {[
+        ["Cloudflare Workers", true],
+        ["Cloudflare KV"],
+        ["Workers AI"],
+        ["Astro", true],
+        ["React"],
+        ["TypeScript"],
+        ["Tailwind"],
+        ["Python"],
+        ["FastAPI"],
+        ["LangGraph", true],
+        ["MCP", true],
+        ["Claude", true],
+        ["DeepSeek"],
+        ["OpenAI"],
+        ["xAI Grok"],
+        ["Ollama"],
+        ["pyATS", true],
+        ["PostgreSQL"],
+        ["ChromaDB"],
+        ["Docker"],
+      ].map(([n, hl]) => (
+        <span
+          class={hl ? "brutal-pill bg-accent text-ink" : "brutal-pill"}
+        >{n}</span>
+      ))}
+    </div>
+  </section>
+
+  <BrutalFooter accent={accent} />
+</Base>

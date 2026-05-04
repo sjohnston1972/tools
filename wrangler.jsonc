@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tools-clydeford",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "RATE_LIMIT_PER_WINDOW": "15",
+    "RATE_LIMIT_WINDOW_SECONDS": "600",
+    "DAILY_TOKEN_BUDGET": "300000"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "RATE_KV",
+      "id": "97ce0461ced949429c1c3af93f44b9b9"
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "tools.clydeford.net",
+      "custom_domain": true
+    }
+  ]
+}

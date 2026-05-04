@@ -1,0 +1,377 @@
+---
+// Stylised fake-screenshot mocks per tool. Pure CSS/HTML, no JS, no images.
+// Used inside tool tiles and the detail-page hero so we always have something
+// to render before real captures land.
+
+interface Props {
+  slug: "gladius" | "shellmate" | "devnet-mcp" | "kopis";
+  accent: string;
+  dim?: boolean;
+}
+const { slug, accent, dim = false } = Astro.props;
+
+const isLight = slug === "devnet-mcp";
+const bg = isLight ? "#fbfaf6" : "#0e0d0c";
+const txt = isLight ? "#1d1b16" : "#e8e3d8";
+const mut = isLight ? "rgba(29,27,22,.55)" : "rgba(232,227,216,.45)";
+const line = isLight ? "rgba(29,27,22,.1)" : "rgba(232,227,216,.08)";
+const filter = dim ? "brightness(0.6) saturate(0.7)" : "none";
+---
+
+<div
+  class="h-full w-full font-mono text-[10px] leading-tight"
+  style={{ background: bg, color: txt, filter }}
+>
+  {slug === "gladius" && (
+    <div class="flex h-full">
+      {/* sidebar */}
+      <div
+        class="flex w-14 flex-col items-center gap-3 py-3"
+        style={{ borderRight: `1px solid ${line}` }}
+      >
+        <span class="block h-5 w-5 rounded" style={{ background: accent }}></span>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <span
+            class="block h-4 w-4 rounded"
+            style={{
+              background: i === 1 ? line : "transparent",
+              border: `1px solid ${line}`,
+            }}
+          ></span>
+        ))}
+      </div>
+      {/* main */}
+      <div class="flex min-w-0 flex-1 flex-col gap-2.5 p-3.5">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-[12px] font-semibold">Audit · 10.0.0.1</div>
+            <div class="mt-0.5 text-[8px]" style={{ color: mut }}>
+              IOS XE 17.9 · running compliance scan
+            </div>
+          </div>
+          <div class="flex gap-1.5">
+            <div
+              class="rounded-sm px-2 py-0.5 text-[8px]"
+              style={{ border: `1px solid ${line}` }}
+            >Email</div>
+            <div
+              class="rounded-sm px-2 py-0.5 text-[8px] text-white"
+              style={{ background: accent }}
+            >Re-run</div>
+          </div>
+        </div>
+        {/* score grid */}
+        <div class="grid grid-cols-4 gap-2">
+          {[
+            ["Overall", "78", "+4"],
+            ["NIST", "82", "—"],
+            ["CIS", "71", "−2"],
+            ["CVEs", "3", "+1"],
+          ].map(([l, v, d], i) => (
+            <div class="rounded-sm p-2" style={{ border: `1px solid ${line}` }}>
+              <div
+                class="text-[7px] uppercase tracking-wider"
+                style={{ color: mut }}
+              >{l}</div>
+              <div class="mt-0.5 text-[16px] font-semibold">{v}</div>
+              <div
+                class="mt-0.5 text-[8px]"
+                style={{ color: i === 3 ? accent : mut }}
+              >{d}</div>
+            </div>
+          ))}
+        </div>
+        {/* findings */}
+        <div class="flex-1 rounded-sm" style={{ border: `1px solid ${line}` }}>
+          {[
+            ["CRIT", "SNMPv2 community 'public' enabled", "CIS 2.3.1"],
+            ["HIGH", "SSH protocol 1 still allowed", "NIST AC-17"],
+            ["MED", "NTP sources unauthenticated", "CIS 6.1.2"],
+          ].map((r, i) => (
+            <div
+              class="grid grid-cols-[44px_1fr_70px] items-center gap-2 px-2.5 py-1.5 text-[8px]"
+              style={{ borderBottom: i < 2 ? `1px solid ${line}` : "none" }}
+            >
+              <span
+                class="font-semibold"
+                style={{ color: r[0] === "CRIT" ? accent : r[0] === "HIGH" ? "#d4a449" : mut }}
+              >{r[0]}</span>
+              <span>{r[1]}</span>
+              <span style={{ color: mut, textAlign: "right" }}>{r[2]}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
+
+  {slug === "shellmate" && (
+    <div class="flex h-full flex-col">
+      {/* tabs */}
+      <div
+        class="flex gap-0.5 px-2 pt-1.5"
+        style={{ background: "rgba(0,0,0,.3)", borderBottom: `1px solid ${line}` }}
+      >
+        {["~/work", "core-01", "logs", "+"].map((t, i) => (
+          <div
+            class="rounded-t-md px-3 py-1 text-[9px]"
+            style={{
+              background: i === 0 ? bg : "transparent",
+              color: i === 0 ? txt : mut,
+              marginBottom: -1,
+            }}
+          >{t}</div>
+        ))}
+      </div>
+      {/* split */}
+      <div class="grid min-h-0 flex-1 grid-cols-[1.4fr_1fr]">
+        <div class="overflow-hidden p-2.5">
+          <div style={{ color: mut }}>$ ssh core-01.lab</div>
+          <div style={{ color: mut }}>Last login: Sat May 02 10:11:42</div>
+          <div class="h-1.5"></div>
+          <div>
+            <span style={{ color: accent }}>steven@core-01</span>
+            <span style={{ color: mut }}>:</span>
+            <span style={{ color: "#7a9fb5" }}>~</span>
+            <span style={{ color: mut }}>$ </span>show ip ospf neighbor
+          </div>
+          <div class="mt-1" style={{ color: mut }}>Neighbor ID    Pri   State        Address</div>
+          {[
+            ["10.0.0.2", "1", "FULL/DR", "10.0.0.2"],
+            ["10.0.0.3", "1", "FULL/BDR", "10.0.0.3"],
+            ["10.0.0.4", "1", "INIT/DROTHER", "10.0.0.4"],
+          ].map(([id, pri, st, ad], i) => (
+            <div class="whitespace-pre">
+              {id.padEnd(15)}{pri.padEnd(6)}<span style={{ color: st === "INIT/DROTHER" ? accent : "#7ab98a" }}>{st.padEnd(15)}</span>{ad}
+            </div>
+          ))}
+          <div class="h-2"></div>
+          <div>
+            <span style={{ color: accent }}>steven@core-01</span>
+            <span style={{ color: mut }}>:</span>
+            <span style={{ color: "#7a9fb5" }}>~</span>
+            <span style={{ color: mut }}>$ </span>
+            <span class="inline-block h-2.5 w-1.5 align-middle" style={{ background: txt }}></span>
+          </div>
+        </div>
+        {/* AI buddy */}
+        <div
+          class="flex flex-col gap-2 p-2.5"
+          style={{ background: "rgba(255,255,255,.02)", borderLeft: `1px solid ${line}` }}
+        >
+          <div
+            class="flex items-center gap-1.5 text-[8px] uppercase tracking-widest"
+            style={{ color: mut }}
+          >
+            <span class="h-1.5 w-1.5 rounded-full" style={{ background: accent }}></span>
+            buddy · DeepSeek
+          </div>
+          <div
+            class="rounded p-2 text-[9px] leading-snug"
+            style={{ background: "rgba(255,255,255,.04)" }}
+          >
+            <div class="mb-1 text-[8px]" style={{ color: mut }}>noticed:</div>
+            10.0.0.4 stuck in INIT — looks like a one-way OSPF hello. Check the neighbour's interface.
+          </div>
+          <div
+            class="rounded p-2 text-[9px] leading-snug"
+            style={{ background: "rgba(255,255,255,.04)" }}
+          >
+            <div class="mb-1 text-[8px]" style={{ color: accent }}>suggested:</div>
+            <div>show interfaces gi0/2 | i hello|adjac</div>
+            <div class="mt-1.5 flex gap-1">
+              <span
+                class="rounded-sm px-1.5 py-0.5 text-[8px] text-white"
+                style={{ background: accent }}>run</span>
+              <span
+                class="rounded-sm px-1.5 py-0.5 text-[8px]"
+                style={{ border: `1px solid ${line}`, color: mut }}>edit</span>
+            </div>
+          </div>
+          <div
+            class="mt-auto pt-1.5 text-[9px]"
+            style={{ borderTop: `1px solid ${line}`, color: mut }}>ask buddy…</div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {slug === "devnet-mcp" && (
+    <div class="flex h-full flex-col">
+      {/* topbar */}
+      <div
+        class="flex items-center gap-2.5 px-3.5 py-2"
+        style={{ background: "#fff", borderBottom: `1px solid ${line}` }}
+      >
+        <div class="text-[11px] font-bold">DevNet MCP</div>
+        <div
+          class="flex overflow-hidden text-[8px]"
+          style={{ border: `1px solid ${line}`, borderRadius: 3 }}
+        >
+          <div class="px-2 py-0.5 text-white" style={{ background: accent }}>MERAKI</div>
+          <div class="px-2 py-0.5" style={{ color: mut }}>CATALYST</div>
+        </div>
+        <div class="ml-auto text-[8px]" style={{ color: mut }}>3 sources · llama-3.3-70b</div>
+      </div>
+      {/* body */}
+      <div class="grid min-h-0 flex-1 grid-cols-[120px_1fr_1fr]">
+        {/* tree */}
+        <div
+          class="overflow-hidden text-[9px]"
+          style={{ background: "#fff", borderRight: `1px solid ${line}`, padding: "10px 0" }}
+        >
+          {[
+            ["▾", "wireless", false, 0],
+            ["", "GET /ssids", true, 1],
+            ["", "PUT /ssids/{n}", false, 1],
+            ["▾", "switches", false, 0],
+            ["", "GET /ports", false, 1],
+            ["▸", "appliances", false, 0],
+            ["▸", "cameras", false, 0],
+          ].map(([c, n, sel, lvl]) => (
+            <div
+              class={`flex gap-1.5 py-0.5 ${sel ? "font-semibold" : ""}`}
+              style={{
+                paddingLeft: 10 + (lvl as number) * 12,
+                paddingRight: 10,
+                background: sel ? `${accent}22` : "transparent",
+                borderLeft: sel ? `2px solid ${accent}` : "2px solid transparent",
+                color: sel ? txt : (lvl as number) === 0 ? txt : mut,
+                fontWeight: (lvl as number) === 0 ? 600 : 400,
+              }}
+            >
+              <span class="w-2" style={{ color: mut }}>{c}</span>{n}
+            </div>
+          ))}
+        </div>
+        {/* chat */}
+        <div class="overflow-hidden p-3" style={{ borderRight: `1px solid ${line}` }}>
+          <div class="text-[8px] uppercase tracking-wider" style={{ color: mut }}>You</div>
+          <div class="mt-1 text-[10px]">how do I list every SSID across an org?</div>
+          <div class="mt-3 text-[8px] uppercase tracking-wider" style={{ color: accent }}>
+            DevNet MCP
+          </div>
+          <div class="mt-1 text-[10px] leading-snug">
+            Use <span class="font-mono" style={{ background: "#0a0a0a", color: "#fff", padding: "0 4px" }}>GET /organizations/{`{orgId}`}/wirelessSsids</span> — returns every SSID across the org.
+          </div>
+        </div>
+        {/* sources */}
+        <div class="overflow-hidden p-3" style={{ background: "#fff" }}>
+          <div class="flex justify-between text-[8px] uppercase tracking-wider" style={{ color: mut }}>
+            <span>Sources</span>
+            <span>247ms</span>
+          </div>
+          <div class="mt-2 space-y-1.5 text-[8.5px]">
+            {[
+              ["meraki", "/wirelessSsids", "doc"],
+              ["meraki", "/devices/{serial}", "doc"],
+              ["catalyst", "wireless-ssids.yang", "schema"],
+            ].map(([k, p, t]) => (
+              <div
+                class="rounded-sm px-2 py-1.5"
+                style={{ border: `1px dashed ${line}` }}
+              >
+                <div class="font-semibold">{k}</div>
+                <div style={{ color: mut }}>{p}</div>
+                <div class="mt-0.5 text-[7px] uppercase tracking-wider" style={{ color: accent }}>
+                  {t}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {slug === "kopis" && (
+    <div class="flex h-full">
+      {/* topology */}
+      <div
+        class="relative flex-[1.4] p-3"
+        style={{ borderRight: `1px solid ${line}` }}
+      >
+        <div class="text-[8px] uppercase tracking-wider" style={{ color: mut }}>
+          Topology · 5 devices · last snap 2m
+        </div>
+        <svg viewBox="0 0 200 140" class="mt-2 h-[calc(100%-28px)] w-full">
+          {/* edges */}
+          <g stroke={mut} stroke-width="1">
+            <line x1="40"  y1="40"  x2="100" y2="70" />
+            <line x1="40"  y1="100" x2="100" y2="70" />
+            <line x1="100" y1="70"  x2="160" y2="40" />
+            <line x1="100" y1="70"  x2="160" y2="100" />
+          </g>
+          {/* faulty edge */}
+          <line x1="40" y1="100" x2="100" y2="70" stroke={accent} stroke-width="2" stroke-dasharray="3 3" />
+          {/* nodes */}
+          {[
+            { x: 40, y: 40, l: "rtr-01" },
+            { x: 40, y: 100, l: "rtr-02", fault: true },
+            { x: 100, y: 70, l: "core-1" },
+            { x: 160, y: 40, l: "edge-1" },
+            { x: 160, y: 100, l: "edge-2" },
+          ].map((n) => (
+            <g>
+              <rect
+                x={n.x - 14}
+                y={n.y - 8}
+                width="28"
+                height="16"
+                fill={bg}
+                stroke={n.fault ? accent : txt}
+                stroke-width={n.fault ? 2 : 1}
+              />
+              <text
+                x={n.x}
+                y={n.y + 3}
+                text-anchor="middle"
+                font-size="6"
+                font-family="ui-monospace, monospace"
+                fill={n.fault ? accent : txt}
+              >{n.l}</text>
+            </g>
+          ))}
+        </svg>
+      </div>
+      {/* finding card */}
+      <div class="flex flex-1 flex-col gap-2 p-3">
+        <div class="text-[8px] uppercase tracking-wider" style={{ color: mut }}>
+          Approval queue · 1 pending
+        </div>
+        <div class="rounded-sm p-2" style={{ border: `1px solid ${line}` }}>
+          <div class="flex items-center gap-1.5">
+            <span
+              class="rounded-sm px-1.5 py-0.5 text-[7px] font-semibold uppercase tracking-wider text-white"
+              style={{ background: accent }}>HIGH</span>
+            <span class="text-[10px] font-semibold">rtr-02 — link flap</span>
+          </div>
+          <div class="mt-1.5 text-[8.5px] leading-snug" style={{ color: mut }}>
+            Interface Gi0/2 has flapped 7× in 24h. Sonnet recommends shutting and re-routing via core-1.
+          </div>
+          <div class="mt-2 grid grid-cols-2 gap-2 text-[8px]">
+            <div>
+              <div style={{ color: mut }} class="text-[7px] uppercase tracking-wider">model</div>
+              <div>Sonnet 4.6</div>
+            </div>
+            <div>
+              <div style={{ color: mut }} class="text-[7px] uppercase tracking-wider">confidence</div>
+              <div>0.87</div>
+            </div>
+          </div>
+          <div class="mt-2 flex gap-1.5">
+            <div class="rounded-sm px-2 py-0.5 text-[8px] text-white" style={{ background: "#1d8a4a" }}>
+              Approve
+            </div>
+            <div class="rounded-sm px-2 py-0.5 text-[8px]" style={{ border: `1px solid ${line}`, color: mut }}>
+              Deny
+            </div>
+            <div class="rounded-sm px-2 py-0.5 text-[8px]" style={{ border: `1px solid ${line}`, color: mut }}>
+              Open in Slack
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+</div>

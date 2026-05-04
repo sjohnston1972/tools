@@ -1,0 +1,26 @@
+---
+interface Props {
+  text: string;
+  /** "accent" | "cream" — sets bg + fg pair */
+  variant?: "accent" | "cream" | "ink";
+}
+const { text, variant = "accent" } = Astro.props;
+
+const variantClass =
+  variant === "accent"
+    ? "bg-accent text-ink"
+    : variant === "ink"
+      ? "bg-ink text-cream"
+      : "bg-cream text-ink";
+---
+
+<div class={`overflow-hidden border-y-2 border-ink ${variantClass} py-3.5`}>
+  <div class="marquee-track text-2xl font-bold tracking-tight">
+    {Array.from({ length: 14 }).map(() => (
+      <span class="inline-flex items-center gap-9">
+        {text}
+        <span class="text-lg">★</span>
+      </span>
+    ))}
+  </div>
+</div>
