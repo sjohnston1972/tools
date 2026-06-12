@@ -39,28 +39,28 @@ import { TOOLS } from "../data/tools";
     <h2 class="text-2xl font-bold tracking-tight">Stack I reach for</h2>
     <div class="mt-8 flex max-w-[860px] flex-wrap gap-2">
       {[
-        ["Cloudflare Workers", true],
-        ["Cloudflare KV"],
-        ["Workers AI"],
-        ["Astro", true],
-        ["React"],
-        ["TypeScript"],
-        ["Tailwind"],
-        ["Python"],
-        ["FastAPI"],
-        ["LangGraph", true],
-        ["MCP", true],
-        ["Claude", true],
-        ["DeepSeek"],
-        ["OpenAI"],
-        ["xAI Grok"],
-        ["Ollama"],
-        ["pyATS", true],
-        ["PostgreSQL"],
-        ["ChromaDB"],
-        ["Docker"],
-      ].map(([n, hl]) => (
-        <span class={hl ? "brutal-pill border-ink font-semibold" : "brutal-pill text-muted"}>{n}</span>
+        "Cloudflare Workers",
+        "Cloudflare KV",
+        "Workers AI",
+        "Astro",
+        "React",
+        "TypeScript",
+        "Tailwind",
+        "Python",
+        "FastAPI",
+        "LangGraph",
+        "MCP",
+        "Claude",
+        "DeepSeek",
+        "OpenAI",
+        "xAI Grok",
+        "Ollama",
+        "pyATS",
+        "PostgreSQL",
+        "ChromaDB",
+        "Docker",
+      ].map((n) => (
+        <span class="brutal-pill">{n}</span>
       ))}
     </div>
   </section>
