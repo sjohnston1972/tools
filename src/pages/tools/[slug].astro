@@ -197,5 +197,30 @@ const peers = [1, 2, 3].map((o) => TOOLS[(idx + o) % TOOLS.length]);
     </div>
   </section>
 
+  {/* floating back button — fades in once the inline hero link scrolls away */}
+  <a
+    id="floating-back"
+    href="/#work"
+    class="fixed left-5 top-[72px] z-30 flex translate-y-[-8px] items-center gap-2 border border-line bg-cream/90 px-3 py-2 text-[12px] font-semibold tracking-[0.04em] text-ink opacity-0 shadow-soft-sm backdrop-blur-sm transition-all duration-200 hover:border-ink md:left-8"
+    aria-label="Back to all tools"
+  >
+    ← Back
+  </a>
+
   <BrutalFooter />
+
+  <script is:inline>
+    (() => {
+      const btn = document.getElementById("floating-back");
+      if (!btn) return;
+      const onScroll = () => {
+        const show = window.scrollY > 220;
+        btn.style.opacity = show ? "1" : "0";
+        btn.style.transform = show ? "translateY(0)" : "translateY(-8px)";
+        btn.style.pointerEvents = show ? "auto" : "none";
+      };
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+    })();
+  </script>
 </Base>
