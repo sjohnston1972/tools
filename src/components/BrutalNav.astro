@@ -7,7 +7,6 @@ const { current = "work" } = Astro.props;
 
 const links = [
   { id: "work",    label: "Work",    href: "/#work" },
-  { id: "process", label: "Process", href: "/#process" },
   { id: "stack",   label: "Stack",   href: "/#stack" },
   { id: "about",   label: "About",   href: "/#about" },
 ];
@@ -32,13 +31,5 @@ const links = [
         {l.label}
       </a>
     ))}
-    <a
-      href="https://clydeford.net"
-      class="ml-3 text-[13px] font-medium text-muted transition-colors hover:text-ink"
-      target="_blank"
-      rel="noopener"
-    >
-      clydeford.net ↗
-    </a>
   </nav>
 </header>

@@ -11,27 +11,16 @@ import { TOOLS } from "../data/tools";
 
   {/* hero */}
   <section class="px-5 pb-16 pt-16 md:px-10 md:pb-20 md:pt-24">
-    <div class="mb-6 flex items-center gap-2.5">
-      <span class="inline-block h-2 w-2 bg-accent"></span>
-      <span class="brutal-eyebrow uppercase">AI tools · 2026</span>
-    </div>
     <h1 class="brutal-h1 max-w-[1000px] text-[44px] sm:text-[64px] md:text-[84px]">
       Smart tools for<br />
       <span class="text-accent">network engineers.</span>
     </h1>
-    <div class="mt-9 grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
-      <p class="max-w-[620px] text-[17px] font-medium leading-relaxed text-muted [text-wrap:pretty]">
-        Internal-shaped tools that fold AI into the spots where network engineers lose hours.
-        Auditors that cite the control they break. Terminals that pair-program. Design agents
-        that argue with themselves. Chat that deploys Azure. Digital twins that propose the
-        fix and wait for your nod.
-      </p>
-      <p class="border-l-2 border-accent pl-4 font-mono text-[11px] uppercase leading-[1.8] tracking-[0.12em] text-muted">
-        Eight tools and counting<br />
-        Built nights, weekends, and the<br class="hidden md:inline" />
-        gaps between datacentre cutovers
-      </p>
-    </div>
+    <p class="mt-9 max-w-[640px] text-[17px] font-medium leading-relaxed text-muted [text-wrap:pretty]">
+      Internal-shaped tools that fold AI into the spots where network engineers lose hours.
+      Auditors that cite the control they break. Terminals that pair-program. Design agents
+      that argue with themselves. Chat that deploys Azure. Digital twins that propose the
+      fix and wait for your nod.
+    </p>
   </section>
 
   {/* tools */}
@@ -45,29 +34,8 @@ import { TOOLS } from "../data/tools";
     </div>
   </section>
 
-  {/* process */}
-  <section id="process" class="scroll-mt-20 bg-ink px-5 py-16 text-cream md:px-10 md:py-20">
-    <h2 class="text-2xl font-bold tracking-tight">
-      How I build <span class="text-accent">↓</span>
-    </h2>
-    <div class="mt-12 grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-      {[
-        ["Live the pain", "I'm a network engineer first. Every tool here exists because I needed it on a Friday at 17:30."],
-        ["Ugly v0", "Real data, real auth, in days, not weeks. Click the thing before the kickoff meeting ends."],
-        ["Earn the LLM", "Where does the model actually pay rent? Build both paths. Let the workflow decide."],
-        ["Ship, observe, leave", "Boring deploy. Documented. Measured. Forget I was here."],
-      ].map(([h, b], i) => (
-        <div class="border-t border-cream/20 pt-6">
-          <div class="font-mono text-[13px] text-accent">0{i + 1}</div>
-          <div class="mt-4 text-[18px] font-bold tracking-tight">{h}</div>
-          <p class="mt-2.5 text-[13.5px] leading-relaxed text-cream/60 [text-wrap:pretty]">{b}</p>
-        </div>
-      ))}
-    </div>
-  </section>
-
   {/* stack */}
-  <section id="stack" class="scroll-mt-20 px-5 py-16 md:px-10 md:py-20">
+  <section id="stack" class="scroll-mt-20 border-t border-line px-5 py-16 md:px-10 md:py-20">
     <h2 class="text-2xl font-bold tracking-tight">Stack I reach for</h2>
     <div class="mt-8 flex max-w-[860px] flex-wrap gap-2">
       {[
