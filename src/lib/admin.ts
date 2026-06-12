@@ -59,7 +59,9 @@ export async function checkAdminPin(
     }
   }
 
-  if (typeof pin !== "string" || !timingSafeEqual(pin, env.ADMIN_PIN)) {
+  // Trim both sides: secrets set via shell pipes can pick up a trailing
+  // newline, and whitespace is meaningless in a PIN.
+  if (typeof pin !== "string" || !timingSafeEqual(pin.trim(), env.ADMIN_PIN.trim())) {
     // Count the failed attempt.
     if (env.RATE_KV) {
       const key = `pin_attempts:${ip}`;
