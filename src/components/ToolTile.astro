@@ -6,59 +6,45 @@ interface Props {
   tool: Tool;
   big?: boolean;
 }
-const { tool, big = false } = Astro.props;
+const { tool } = Astro.props;
 ---
 
 <a
   href={`/tools/${tool.slug}`}
-  class={`tile-lift block ${big ? "shadow-brutal-lg" : "shadow-brutal"} bg-cream border-2 border-ink h-full flex flex-col`}
+  class="group flex h-full flex-col border border-line bg-cream transition-all duration-150 hover:border-ink hover:shadow-soft"
 >
-  <div
-    class="flex items-center justify-between border-b-2 border-ink px-4 py-3 text-[11px] font-bold tracking-[0.15em]"
-  >
-    <span>№ {tool.n}</span>
-    <span>{tool.year}</span>
+  <div class="flex items-center justify-between border-b border-line px-4 py-2.5">
+    <span class="font-mono text-[10.5px] text-muted">№ {tool.n}</span>
+    <span class="font-mono text-[10.5px] uppercase tracking-[0.12em] text-muted">{tool.status}</span>
   </div>
 
-  <div
-    class="aspect-[4/3] overflow-hidden border-b-2 border-ink"
-    style={{ background: tool.color }}
-  >
-    <div class="m-4 h-[calc(100%-2rem)] border" style={{ borderColor: "rgba(0,0,0,.2)" }}>
+  <div class="border-b border-line bg-cream-2 p-3.5">
+    <div class="aspect-[4/3] overflow-hidden border border-line">
       <ToolMock slug={tool.slug} accent={tool.color} />
     </div>
   </div>
 
-  <div class="flex flex-1 flex-col p-5 md:p-6">
-    <div
-      class="brutal-eyebrow mb-2 uppercase"
-      style={{ color: tool.color }}
-    >
+  <div class="flex flex-1 flex-col p-5">
+    <div class="brutal-eyebrow uppercase" style={{ color: tool.color }}>
       {tool.tag}
     </div>
-    <div
-      class={`mb-3 font-extrabold leading-none tracking-crush ${big ? "text-4xl" : "text-3xl"}`}
-    >
-      {tool.name}
-    </div>
-    <p class="flex-1 text-[13.5px] leading-relaxed text-[#222] [text-wrap:pretty]">
+    <div class="mt-1.5 text-[22px] font-bold tracking-tight">{tool.name}</div>
+    <p class="mt-2 flex-1 text-[13.5px] leading-relaxed text-muted [text-wrap:pretty]">
       {tool.blurb}
     </p>
 
     <div class="mt-4 flex flex-wrap gap-1.5">
-      {tool.stack.slice(0, 5).map((s) => (
+      {tool.stack.slice(0, 4).map((s) => (
         <span class="brutal-tag">{s}</span>
       ))}
-      {tool.stack.length > 5 && (
-        <span class="brutal-tag opacity-50">+{tool.stack.length - 5}</span>
+      {tool.stack.length > 4 && (
+        <span class="brutal-tag opacity-60">+{tool.stack.length - 4}</span>
       )}
     </div>
 
-    <div
-      class="mt-4 flex items-center justify-between border-t-[1.5px] border-dashed border-ink pt-3 text-[13px] font-bold"
-    >
-      <span>READ THE STORY</span>
-      <span>↗</span>
+    <div class="mt-5 flex items-center justify-between border-t border-line pt-3.5 text-[13px] font-semibold">
+      <span>Read the story</span>
+      <span class="row-arrow text-muted group-hover:text-ink">→</span>
     </div>
   </div>
 </a>

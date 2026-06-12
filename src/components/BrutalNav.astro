@@ -3,50 +3,42 @@ interface Props {
   current?: "work" | "process" | "stack" | "about";
   accent?: string;
 }
-const { current = "work", accent = "#ff5b1f" } = Astro.props;
+const { current = "work" } = Astro.props;
 
 const links = [
-  { id: "work",    label: "WORK",    href: "/#work" },
-  { id: "process", label: "PROCESS", href: "/#process" },
-  { id: "stack",   label: "STACK",   href: "/#stack" },
-  { id: "about",   label: "ABOUT",   href: "/#about" },
+  { id: "work",    label: "Work",    href: "/#work" },
+  { id: "process", label: "Process", href: "/#process" },
+  { id: "stack",   label: "Stack",   href: "/#stack" },
+  { id: "about",   label: "About",   href: "/#about" },
 ];
 ---
 
 <header
-  class="sticky top-0 z-40 flex items-center justify-between border-b-2 border-ink bg-cream px-5 py-4 md:px-10"
+  class="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-cream/90 px-5 py-4 backdrop-blur-sm md:px-10"
 >
-  <a
-    href="/"
-    class="flex items-center gap-2.5 text-lg font-extrabold tracking-tight md:text-xl"
-  >
-    <span
-      class="inline-block h-5 w-5 md:h-[22px] md:w-[22px]"
-      style={{ background: accent }}
-      aria-hidden="true"
-    ></span>
-    STEVEN.JOHNSTON
+  <a href="/" class="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight">
+    <span class="inline-block h-2 w-2 bg-accent" aria-hidden="true"></span>
+    Steven Johnston
   </a>
 
-  <nav class="flex items-center gap-1 md:gap-1">
+  <nav class="flex items-center gap-1">
     {links.map((l) => (
       <a
         href={l.href}
-        class={`hidden md:inline-block px-3 py-1.5 text-xs font-bold tracking-[0.1em] border-b-2 ${
-          current === l.id ? "" : "border-transparent"
+        class={`hidden px-3 py-1.5 text-[13px] font-medium transition-colors md:inline-block ${
+          current === l.id ? "text-ink" : "text-muted hover:text-ink"
         }`}
-        style={current === l.id ? { borderColor: accent } : {}}
       >
         {l.label}
       </a>
     ))}
     <a
       href="https://clydeford.net"
-      class="brutal-link-cta ml-2"
+      class="ml-3 text-[13px] font-medium text-muted transition-colors hover:text-ink"
       target="_blank"
       rel="noopener"
     >
-      ABOUT ME ↗
+      clydeford.net ↗
     </a>
   </nav>
 </header>

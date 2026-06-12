@@ -4,34 +4,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        cream: "#fefdf8",
-        "cream-2": "#faf9f5",
-        ink: "#0a0a0a",
-        accent: "#ff5b1f",
-        "accent-blue": "#3a4eff",
-        "accent-green": "#1d8a4a",
-        "accent-purple": "#8b3aff",
-        highlight: "#fff7a8",
+        // "cream" kept as a token name for compatibility; it now maps to the
+        // minimal palette's paper white.
+        cream: "#fdfdfb",
+        "cream-2": "#f4f4f1",
+        ink: "#161614",
+        muted: "#71716b",
+        line: "#e6e6e1",
+        accent: "#e8470c",
+        highlight: "#f4f4f1",
       },
       fontFamily: {
-        display: ['"Space Grotesk"', "Inter", "system-ui", "sans-serif"],
-        mono: [
-          "ui-monospace",
-          "SFMono-Regular",
-          "Menlo",
-          "monospace",
-        ],
+        display: ['"Instrument Sans"', "Inter", "system-ui", "sans-serif"],
+        mono: ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       boxShadow: {
-        brutal: "8px 8px 0 #0a0a0a",
-        "brutal-sm": "6px 6px 0 #0a0a0a",
-        "brutal-lg": "12px 12px 0 #0a0a0a",
-        "brutal-hover": "12px 12px 0 #0a0a0a",
-        "brutal-stamp": "4px 4px 0 #0a0a0a",
+        soft: "0 1px 2px rgba(20,20,18,.05), 0 12px 32px rgba(20,20,18,.07)",
+        "soft-sm": "0 1px 2px rgba(20,20,18,.05), 0 6px 16px rgba(20,20,18,.06)",
+        // legacy names kept so stray usages degrade gracefully
+        brutal: "0 1px 2px rgba(20,20,18,.05), 0 12px 32px rgba(20,20,18,.07)",
+        "brutal-sm": "0 1px 2px rgba(20,20,18,.05), 0 6px 16px rgba(20,20,18,.06)",
+        "brutal-lg": "0 2px 4px rgba(20,20,18,.05), 0 20px 48px rgba(20,20,18,.08)",
+        "brutal-hover": "0 2px 4px rgba(20,20,18,.05), 0 20px 48px rgba(20,20,18,.08)",
+        "brutal-stamp": "none",
       },
       letterSpacing: {
-        crush: "-0.05em",
-        smash: "-0.06em",
+        crush: "-0.025em",
+        smash: "-0.03em",
       },
     },
   },

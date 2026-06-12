@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from "react";
 type Msg = { role: "user" | "assistant"; content: string };
 
 const SUGGESTIONS = [
-  "What's the difference between Gladius and Kopis?",
-  "How does Shellmate decide which model to use?",
-  "Why MCP for Cisco DevNet?",
+  "What's the difference between Gladius and Parity?",
+  "How does Archie verify its design citations?",
+  "What can CloudForge do that Azure's own MCP can't?",
   "What's Steven's day job?",
 ];
 
@@ -160,29 +160,29 @@ export default function ChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`fixed bottom-5 right-5 z-50 flex items-center gap-2 border-2 border-ink bg-accent px-4 py-3 text-sm font-extrabold uppercase tracking-wider text-ink shadow-brutal-sm transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-brutal md:bottom-8 md:right-8 ${open ? "hidden" : ""}`}
+        className={`fixed bottom-5 right-5 z-50 flex items-center gap-2.5 bg-ink px-4 py-3 text-xs font-semibold tracking-[0.08em] text-cream shadow-soft transition-colors hover:bg-accent md:bottom-8 md:right-8 ${open ? "hidden" : ""}`}
         aria-label="Open chat"
       >
-        <span className="inline-block h-2.5 w-2.5 rounded-full bg-ink"></span>
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
         Ask the bot
       </button>
 
       {/* panel */}
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-end bg-ink/30 p-2 sm:p-5 md:items-end md:p-8"
+          className="fixed inset-0 z-50 flex items-end justify-end bg-ink/20 p-2 sm:p-5 md:items-end md:p-8"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
           }}
         >
           <div
-            className="flex h-[88vh] w-full max-w-[440px] flex-col border-2 border-ink bg-cream shadow-brutal sm:h-[80vh] md:h-[640px]"
+            className="flex h-[88vh] w-full max-w-[440px] flex-col border border-line bg-cream shadow-soft sm:h-[80vh] md:h-[640px]"
           >
             {/* header */}
-            <div className="flex items-center justify-between border-b-2 border-ink bg-ink px-4 py-3 text-cream">
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-3 w-3 bg-accent"></span>
-                <span className="text-xs font-extrabold uppercase tracking-[0.15em]">
+            <div className="flex items-center justify-between border-b border-line px-4 py-3">
+              <div className="flex items-center gap-2.5">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+                <span className="font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-muted">
                   Ask about the tools
                 </span>
               </div>
@@ -190,14 +190,14 @@ export default function ChatWidget() {
                 <button
                   type="button"
                   onClick={clear}
-                  className="border border-cream/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider hover:bg-cream hover:text-ink"
+                  className="px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted transition-colors hover:text-ink"
                 >
                   Clear
                 </button>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="border border-cream/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider hover:bg-cream hover:text-ink"
+                  className="px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted transition-colors hover:text-ink"
                   aria-label="Close chat"
                 >
                   ✕
@@ -209,8 +209,8 @@ export default function ChatWidget() {
             <div ref={scrollRef} className="chat-scroll flex-1 overflow-y-auto p-4">
               {messages.length === 0 && (
                 <div className="space-y-3">
-                  <p className="text-sm leading-relaxed">
-                    Powered by DeepSeek. Strictly on-topic — Steven and his four tools.
+                  <p className="text-[13.5px] leading-relaxed text-muted">
+                    Powered by DeepSeek. Strictly on topic: Steven and his eight tools.
                     Conversations are not stored on the server.
                   </p>
                   <div className="space-y-1.5">
@@ -219,7 +219,7 @@ export default function ChatWidget() {
                         key={s}
                         type="button"
                         onClick={() => send(s)}
-                        className="block w-full border-2 border-ink bg-cream px-3 py-2 text-left text-[13px] font-medium hover:bg-accent"
+                        className="block w-full border border-line px-3 py-2 text-left text-[13px] font-medium transition-colors hover:border-ink"
                       >
                         {s}
                       </button>
@@ -231,10 +231,10 @@ export default function ChatWidget() {
               {messages.map((m, i) => (
                 <div key={i} className={`mb-3 ${m.role === "user" ? "text-right" : ""}`}>
                   <div
-                    className={`inline-block max-w-[88%] whitespace-pre-wrap border-2 border-ink px-3 py-2 text-[13.5px] leading-relaxed ${
+                    className={`inline-block max-w-[88%] whitespace-pre-wrap px-3 py-2 text-[13.5px] leading-relaxed ${
                       m.role === "user"
                         ? "bg-ink text-cream"
-                        : "bg-cream"
+                        : "border border-line bg-cream-2"
                     }`}
                   >
                     {m.content || (
@@ -245,7 +245,7 @@ export default function ChatWidget() {
               ))}
 
               {error && (
-                <div className="mt-2 border-2 border-ink bg-accent/30 px-3 py-2 text-[12px]">
+                <div className="mt-2 border border-accent/40 bg-accent/5 px-3 py-2 text-[12px] text-ink">
                   {error}
                 </div>
               )}
@@ -257,7 +257,7 @@ export default function ChatWidget() {
                 e.preventDefault();
                 send(input);
               }}
-              className="flex gap-2 border-t-2 border-ink p-3"
+              className="flex gap-2 border-t border-line p-3"
             >
               <textarea
                 rows={3}
@@ -269,14 +269,14 @@ export default function ChatWidget() {
                     send(input);
                   }
                 }}
-                placeholder="Ask about Gladius, Shellmate, DevNet MCP, Kopis or Steven…"
-                className="min-h-[64px] flex-1 resize-none border-2 border-ink bg-cream px-3 py-2 text-[13.5px] leading-snug outline-none focus:bg-white"
+                placeholder="Ask about Gladius, Parity, Archie, CloudForge or Steven…"
+                className="min-h-[64px] flex-1 resize-none border border-line bg-cream px-3 py-2 text-[13.5px] leading-snug outline-none transition-colors focus:border-ink"
                 disabled={streaming}
               />
               <button
                 type="submit"
                 disabled={streaming || !input.trim()}
-                className="border-2 border-ink bg-accent px-4 py-2 text-xs font-extrabold uppercase tracking-wider text-ink disabled:opacity-40"
+                className="bg-ink px-4 py-2 text-xs font-semibold tracking-[0.06em] text-cream transition-colors hover:bg-accent disabled:opacity-40"
               >
                 {streaming ? "…" : "Send"}
               </button>

@@ -16,72 +16,60 @@
     text-rendering: optimizeLegibility;
   }
   a { color: inherit; }
-  ::selection { background: theme(colors.accent); color: theme(colors.cream); }
+  ::selection { background: theme(colors.ink); color: theme(colors.cream); }
 }
 
 @layer components {
+  /* Class names predate the minimal restyle; definitions are the source of truth. */
   .brutal-card {
-    @apply border-2 border-ink bg-cream shadow-brutal;
+    @apply border border-line bg-cream;
   }
   .brutal-card-sm {
-    @apply border-2 border-ink bg-cream shadow-brutal-sm;
+    @apply border border-line bg-cream;
   }
   .brutal-tag {
-    @apply inline-flex items-center border-[1.5px] border-ink px-2 py-[3px] text-[11px] font-bold tracking-[0.05em];
+    @apply inline-flex items-center border border-line px-2 py-[3px] font-mono text-[10.5px] font-medium text-muted;
   }
   .brutal-pill {
-    @apply inline-flex items-center border-2 border-ink bg-cream px-[14px] py-2 text-sm font-bold;
+    @apply inline-flex items-center border border-line px-3 py-1.5 text-[13px] font-medium;
   }
   .brutal-pill-accent {
-    @apply inline-flex items-center border-2 border-ink bg-accent px-[14px] py-2 text-sm font-bold text-ink;
+    @apply inline-flex items-center border border-ink px-3 py-1.5 text-[13px] font-medium;
   }
   .brutal-h1 {
-    @apply font-extrabold leading-[0.95] tracking-smash;
+    @apply font-bold leading-[0.98] tracking-smash;
   }
   .brutal-h2 {
-    @apply text-5xl font-extrabold leading-[0.95] tracking-crush md:text-6xl;
+    @apply text-3xl font-semibold leading-tight tracking-crush md:text-4xl;
   }
   .brutal-eyebrow {
-    @apply text-[11px] font-bold tracking-[0.15em];
+    @apply font-mono text-[10.5px] font-medium uppercase tracking-[0.18em] text-muted;
   }
   .brutal-link-cta {
-    @apply inline-flex items-center bg-ink px-4 py-2 text-xs font-bold tracking-[0.1em] text-cream hover:bg-accent hover:text-ink transition-colors;
+    @apply inline-flex items-center bg-ink px-4 py-2.5 text-xs font-semibold tracking-[0.08em] text-cream transition-colors hover:bg-accent;
   }
 }
 
-/* fancy hover lift for tiles */
-.tile-lift {
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.tile-lift:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 12px 12px 0 #0a0a0a;
-}
+/* quiet hover for list rows / cards */
+.tile-lift,
 .tile-lift-sm {
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
+.tile-lift:hover,
 .tile-lift-sm:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 8px 8px 0 #0a0a0a;
+  background-color: theme(colors.cream-2);
 }
 
-/* marquee */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+/* row arrow nudge */
+.row-arrow {
+  transition: transform 0.15s ease;
 }
-.marquee-track {
-  display: inline-flex;
-  gap: 36px;
-  white-space: nowrap;
-  animation: marquee 32s linear infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track { animation: none; }
+a:hover .row-arrow {
+  transform: translateX(4px);
 }
 
 /* chat scrollbar */
 .chat-scroll::-webkit-scrollbar { width: 8px; }
 .chat-scroll::-webkit-scrollbar-track { background: transparent; }
-.chat-scroll::-webkit-scrollbar-thumb { background: #0a0a0a33; border-radius: 4px; }
-.chat-scroll::-webkit-scrollbar-thumb:hover { background: #0a0a0a55; }
+.chat-scroll::-webkit-scrollbar-thumb { background: #16161422; border-radius: 4px; }
+.chat-scroll::-webkit-scrollbar-thumb:hover { background: #16161444; }

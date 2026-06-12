@@ -2,49 +2,43 @@
 interface Props {
   accent?: string;
 }
-const { accent = "#ff5b1f" } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
 <section
   id="about"
-  class="grid items-end gap-8 border-y-2 border-ink px-5 py-10 md:grid-cols-[2fr_1fr] md:px-10 md:py-14"
-  style={{ background: accent }}
+  class="scroll-mt-20 grid items-end gap-10 border-t border-line px-5 py-16 md:grid-cols-[2fr_1fr] md:px-10 md:py-20"
 >
   <div>
-    <div class="mb-3 brutal-eyebrow">NEXT STEP →</div>
+    <div class="brutal-eyebrow mb-4 uppercase">Get in touch</div>
     <a
       href="mailto:Stevie.Johnston@gmail.com"
-      class="block text-3xl font-extrabold leading-[0.95] tracking-smash sm:text-5xl md:text-6xl break-all md:break-normal"
+      class="block break-all text-3xl font-bold tracking-tight transition-colors hover:text-accent sm:text-4xl md:break-normal md:text-6xl"
     >
-      STEVIE.JOHNSTON@<br />GMAIL.COM
+      stevie.johnston@gmail.com
     </a>
   </div>
-  <div class="text-sm font-semibold leading-relaxed">
-    <div>Glasgow · Scotland</div>
+  <div class="text-[14px] font-medium leading-relaxed text-muted">
+    <div>Glasgow, Scotland</div>
     <div>UTC+0 / UTC+1</div>
-    <div class="mt-3">
-      <a href="https://clydeford.net" class="underline" target="_blank" rel="noopener">
+    <div class="mt-4 flex flex-col gap-1">
+      <a href="https://clydeford.net" class="transition-colors hover:text-ink" target="_blank" rel="noopener">
         clydeford.net ↗
       </a>
-    </div>
-    <div>
       <a
         href="https://www.linkedin.com/in/steven-johnston-474a5333/"
-        class="underline"
+        class="transition-colors hover:text-ink"
         target="_blank"
         rel="noopener">LinkedIn ↗</a>
-    </div>
-    <div>
-      <a href="https://github.com/sjohnston1972" class="underline" target="_blank" rel="noopener"
+      <a href="https://github.com/sjohnston1972" class="transition-colors hover:text-ink" target="_blank" rel="noopener"
         >GitHub ↗</a>
     </div>
   </div>
 </section>
 
 <footer
-  class="flex flex-col items-start justify-between gap-2 bg-cream px-5 py-5 text-xs font-semibold sm:flex-row sm:items-center md:px-10"
+  class="flex flex-col items-start justify-between gap-2 border-t border-line px-5 py-5 font-mono text-[11px] text-muted sm:flex-row sm:items-center md:px-10"
 >
-  <span>© {year} · STEVEN JOHNSTON · BUILT BY HAND, AND BY CLAUDE.</span>
-  <span class="opacity-60">tools.clydeford.net</span>
+  <span>© {year} Steven Johnston · built by hand, and by Claude</span>
+  <span>tools.clydeford.net</span>
 </footer>

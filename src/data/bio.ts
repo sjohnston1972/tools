@@ -2,16 +2,16 @@
 // the model treats it as ground truth. Sourced from clydeford.net.
 
 export const BIO = `
-Steven Johnston — Technical Lead at Sword Group (formerly Ping Network Solutions). Based in Glasgow, Scotland. SC cleared.
+Steven Johnston, Technical Lead at Sword Group (formerly Ping Network Solutions). Based in Glasgow, Scotland. SC cleared.
 
 Career arc: hands-on engineer → solutions architect → technical leader. Currently leads a team of seven consultants and owns end-to-end technical design across concurrent delivery programmes. Operates at Lead Architect level across networking, security, cloud, and AI-driven automation.
 
 Recent work (2024–present, Sword Group):
 - Designed and delivered a resilient, multi-region Cisco ISE + Palo Alto + Cisco SD-WAN deployment in Azure for a critical national infrastructure client, establishing zero-trust network access.
 - Architected a secure cloud-based AI platform on Azure to automate network operations workflows, integrating LLM-based tooling with enterprise infrastructure.
-- Directed a multi-datacentre and offshore transformation programme (SD-WAN, Cisco Nexus DC switching, Palo Alto edge security) — delivered on time and budget.
+- Directed a multi-datacentre and offshore transformation programme (SD-WAN, Cisco Nexus DC switching, Palo Alto edge security), delivered on time and budget.
 - Delivered campus-wide firewall and LAN refresh programmes across multiple Scottish public sector clients (colleges, universities, government).
-- Champions DevOps within the team — CI/CD pipelines, infrastructure-as-code, automated testing.
+- Champions DevOps within the team: CI/CD pipelines, infrastructure-as-code, automated testing.
 
 Career history:
 - 2024–present: Technical Lead, Sword Group (formerly Ping Network Solutions).
@@ -24,9 +24,9 @@ Public sector clients (notable): Scottish Courts and Tribunals Service, Scottish
 
 Credentials:
 - SC Cleared (UK Government)
-- CCNP Enterprise (Routing & Switching) — valid through 2027
-- CCNP Collaboration — valid through 2027
-- Cisco specialist certifications: Data Centre Operations, Collaboration Applications, Call Control & Mobility, Collaboration Cloud & Edge, Collaboration Core, Enterprise Advanced Infrastructure, Enterprise Core, CCNA — all valid through 2027
+- CCNP Enterprise (Routing & Switching), valid through 2027
+- CCNP Collaboration, valid through 2027
+- Cisco specialist certifications: Data Centre Operations, Collaboration Applications, Call Control & Mobility, Collaboration Cloud & Edge, Collaboration Core, Enterprise Advanced Infrastructure, Enterprise Core, CCNA. All valid through 2027.
 
 Areas of expertise:
 - Infrastructure: network architecture & design, HLD/LLD documentation, WAN and SD-WAN, BGP & OSPF, campus LAN/WAN.
@@ -36,7 +36,7 @@ Areas of expertise:
 - Datacentre: Cisco UCS, Cisco Nexus, VMware, Nutanix, DC design.
 - Automation & Dev: Python, Terraform, Ansible, Docker, agentic network automation, AI workflows & integration.
 
-For the past two years, Steven has been embedding agentic AI into infrastructure operations — designing and deploying agentic automation platforms that reduce manual effort, accelerate delivery, and surface intelligence engineers can act on.
+For the past two years, Steven has been embedding agentic AI into infrastructure operations: designing and deploying agentic automation platforms that reduce manual effort, accelerate delivery, and surface intelligence engineers can act on.
 
 Contact: Stevie.Johnston@gmail.com · LinkedIn linkedin.com/in/steven-johnston-474a5333 · personal site clydeford.net.
 `.trim();

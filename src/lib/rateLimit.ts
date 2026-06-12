@@ -5,11 +5,11 @@
 
 const witty = (seconds: number) => {
   const mins = Math.max(1, Math.ceil(seconds / 60));
-  return `Somebody is battering the cr@p out of Steven's API credits — cooldown in effect for ${mins} minute${mins === 1 ? "" : "s"}. Try again shortly, or read about [Gladius](/tools/gladius) while you wait.`;
+  return `Somebody is battering the cr@p out of Steven's API credits. Cooldown in effect for ${mins} minute${mins === 1 ? "" : "s"}. Try again shortly, or read about [Gladius](/tools/gladius) while you wait.`;
 };
 
 const wittyDaily = () =>
-  `The chat has hit its daily token budget — Steven's wallet is wheezing. Come back tomorrow, or browse the four tools above in the meantime.`;
+  `The chat has hit its daily token budget and Steven's wallet is wheezing. Come back tomorrow, or browse the eight tools above in the meantime.`;
 
 export type RateCheck =
   | { ok: true }

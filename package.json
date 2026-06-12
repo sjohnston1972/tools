@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build && node -e \"require('fs').writeFileSync('dist/.assetsignore','_worker.js\\n_routes.json\\n')\"",
     "preview": "wrangler dev",
-    "deploy": "astro build && wrangler deploy",
+    "deploy": "npm run build && wrangler deploy",
     "astro": "astro",
     "cf-typegen": "wrangler types"
   },

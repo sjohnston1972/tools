@@ -3,14 +3,16 @@
 // Used inside tool tiles and the detail-page hero so we always have something
 // to render before real captures land.
 
+import type { Tool } from "../data/tools";
+
 interface Props {
-  slug: "gladius" | "shellmate" | "devnet-mcp" | "kopis";
+  slug: Tool["slug"];
   accent: string;
   dim?: boolean;
 }
 const { slug, accent, dim = false } = Astro.props;
 
-const isLight = slug === "devnet-mcp";
+const isLight = slug === "cisco-api-navigator" || slug === "webex-migrate";
 const bg = isLight ? "#fbfaf6" : "#0e0d0c";
 const txt = isLight ? "#1d1b16" : "#e8e3d8";
 const mut = isLight ? "rgba(29,27,22,.55)" : "rgba(232,227,216,.45)";
@@ -171,7 +173,7 @@ const filter = dim ? "brightness(0.6) saturate(0.7)" : "none";
             style={{ background: "rgba(255,255,255,.04)" }}
           >
             <div class="mb-1 text-[8px]" style={{ color: mut }}>noticed:</div>
-            10.0.0.4 stuck in INIT — looks like a one-way OSPF hello. Check the neighbour's interface.
+            10.0.0.4 stuck in INIT. Looks like a one-way OSPF hello. Check the neighbour's interface.
           </div>
           <div
             class="rounded p-2 text-[9px] leading-snug"
@@ -196,14 +198,14 @@ const filter = dim ? "brightness(0.6) saturate(0.7)" : "none";
     </div>
   )}
 
-  {slug === "devnet-mcp" && (
+  {slug === "cisco-api-navigator" && (
     <div class="flex h-full flex-col">
       {/* topbar */}
       <div
         class="flex items-center gap-2.5 px-3.5 py-2"
         style={{ background: "#fff", borderBottom: `1px solid ${line}` }}
       >
-        <div class="text-[11px] font-bold">DevNet MCP</div>
+        <div class="text-[11px] font-bold">Cisco API Navigator</div>
         <div
           class="flex overflow-hidden text-[8px]"
           style={{ border: `1px solid ${line}`, borderRadius: 3 }}
@@ -249,10 +251,10 @@ const filter = dim ? "brightness(0.6) saturate(0.7)" : "none";
           <div class="text-[8px] uppercase tracking-wider" style={{ color: mut }}>You</div>
           <div class="mt-1 text-[10px]">how do I list every SSID across an org?</div>
           <div class="mt-3 text-[8px] uppercase tracking-wider" style={{ color: accent }}>
-            DevNet MCP
+            Navigator
           </div>
           <div class="mt-1 text-[10px] leading-snug">
-            Use <span class="font-mono" style={{ background: "#0a0a0a", color: "#fff", padding: "0 4px" }}>GET /organizations/{`{orgId}`}/wirelessSsids</span> — returns every SSID across the org.
+            Use <span class="font-mono" style={{ background: "#0a0a0a", color: "#fff", padding: "0 4px" }}>GET /organizations/{`{orgId}`}/wirelessSsids</span>. Returns every SSID across the org.
           </div>
         </div>
         {/* sources */}
@@ -284,7 +286,7 @@ const filter = dim ? "brightness(0.6) saturate(0.7)" : "none";
     </div>
   )}
 
-  {slug === "kopis" && (
+  {slug === "parity" && (
     <div class="flex h-full">
       {/* topology */}
       <div
@@ -344,7 +346,7 @@ const filter = dim ? "brightness(0.6) saturate(0.7)" : "none";
             <span
               class="rounded-sm px-1.5 py-0.5 text-[7px] font-semibold uppercase tracking-wider text-white"
               style={{ background: accent }}>HIGH</span>
-            <span class="text-[10px] font-semibold">rtr-02 — link flap</span>
+            <span class="text-[10px] font-semibold">rtr-02 · link flap</span>
           </div>
           <div class="mt-1.5 text-[8.5px] leading-snug" style={{ color: mut }}>
             Interface Gi0/2 has flapped 7× in 24h. Sonnet recommends shutting and re-routing via core-1.
@@ -371,6 +373,250 @@ const filter = dim ? "brightness(0.6) saturate(0.7)" : "none";
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  )}
+
+  {slug === "archie" && (
+    <div class="flex h-full">
+      {/* sections */}
+      <div
+        class="flex w-[38%] flex-col gap-1.5 p-3"
+        style={{ borderRight: `1px solid ${line}` }}
+      >
+        <div class="text-[8px] uppercase tracking-wider" style={{ color: mut }}>
+          Design · acme-2026 · run #4
+        </div>
+        {[
+          ["LAN", "approved", "12 citations"],
+          ["WAN", "critic · round 2/5", "1 flaw open"],
+          ["QOS", "designing…", "—"],
+          ["CLOUD", "queued", "—"],
+        ].map(([s, st, d]) => (
+          <div class="rounded-sm px-2 py-1.5" style={{ border: `1px solid ${line}` }}>
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-semibold">{s}</span>
+              <span
+                class="text-[7px] uppercase tracking-wider"
+                style={{ color: st === "approved" ? "#7ab98a" : st === "queued" ? mut : accent }}
+              >{st}</span>
+            </div>
+            <div class="mt-0.5 text-[7.5px]" style={{ color: mut }}>{d}</div>
+          </div>
+        ))}
+      </div>
+      {/* designer vs critic */}
+      <div class="flex min-w-0 flex-1 flex-col gap-2 p-3">
+        <div class="text-[8px] uppercase tracking-wider" style={{ color: mut }}>
+          WAN · designer ⇄ critic
+        </div>
+        <div class="rounded-sm p-2 text-[8.5px] leading-snug" style={{ border: `1px solid ${line}` }}>
+          <div class="mb-1 text-[7px] uppercase tracking-wider" style={{ color: mut }}>designer</div>
+          Dual-homed DMVPN hubs, EIGRP named mode, per-tunnel QoS.
+          <div class="mt-1.5 flex flex-wrap gap-1">
+            {["WAN-DG §4.2", "QoS-DG §2.1", "unsourced ×1"].map((c) => (
+              <span
+                class="rounded-sm px-1.5 py-0.5 text-[7px]"
+                style={{
+                  border: `1px solid ${line}`,
+                  color: c.startsWith("unsourced") ? accent : mut,
+                }}
+              >{c}</span>
+            ))}
+          </div>
+        </div>
+        <div class="rounded-sm p-2 text-[8.5px] leading-snug" style={{ border: `1px solid ${accent}` }}>
+          <div class="mb-1 text-[7px] uppercase tracking-wider" style={{ color: accent }}>critic · strictness 4</div>
+          Citation WAN-DG §4.2 verified ✓, but no failover timer rationale. Revise.
+        </div>
+        <div class="mt-auto text-[8px]" style={{ color: mut }}>
+          coherence pass: LAN voice CoS ↔ QOS class map · 1 conflict
+        </div>
+      </div>
+    </div>
+  )}
+
+  {slug === "cloudforge" && (
+    <div class="flex h-full flex-col">
+      {/* stage bar */}
+      <div
+        class="flex items-center gap-1 px-3 py-1.5"
+        style={{ borderBottom: `1px solid ${line}` }}
+      >
+        {["BUILD", "VIEW BICEP", "PUSH", "TEAR DOWN", "SCHEDULE"].map((s, i) => (
+          <div
+            class="rounded-sm px-2 py-0.5 text-[7px] tracking-wider"
+            style={{
+              background: i === 2 ? accent : "transparent",
+              color: i === 2 ? "#fff" : mut,
+              border: i === 2 ? "none" : `1px solid ${line}`,
+            }}
+          >{s}</div>
+        ))}
+        <div class="ml-auto text-[8px]" style={{ color: mut }}>320 tools · cached</div>
+      </div>
+      <div class="grid min-h-0 flex-1 grid-cols-[1fr_1.2fr]">
+        {/* chat */}
+        <div class="overflow-hidden p-3" style={{ borderRight: `1px solid ${line}` }}>
+          <div class="text-[8px] uppercase tracking-wider" style={{ color: mut }}>You</div>
+          <div class="mt-1 text-[9.5px]">hub-and-spoke, two spokes, one VPN gateway</div>
+          <div class="mt-2.5 text-[8px] uppercase tracking-wider" style={{ color: accent }}>CloudForge</div>
+          <div class="mt-1 text-[9px] leading-snug" style={{ color: mut }}>
+            Topology drafted. Bicep ready in the drawer.
+          </div>
+          <div
+            class="mt-2 rounded-sm px-2 py-1 text-[8px]"
+            style={{ border: `1px solid ${line}`, color: mut }}
+          >⚙ az deployment sub create · running…</div>
+        </div>
+        {/* canvas */}
+        <div class="relative p-3">
+          <svg viewBox="0 0 200 130" class="h-full w-full">
+            <g stroke={mut} stroke-width="1">
+              <line x1="100" y1="40" x2="45" y2="95" />
+              <line x1="100" y1="40" x2="155" y2="95" />
+              <line x1="100" y1="40" x2="100" y2="100" />
+            </g>
+            {[
+              { x: 100, y: 40, l: "hub-vnet", hl: true },
+              { x: 45, y: 95, l: "spoke-a" },
+              { x: 155, y: 95, l: "spoke-b" },
+              { x: 100, y: 100, l: "vpn-gw" },
+            ].map((n) => (
+              <g>
+                <rect
+                  x={n.x - 22}
+                  y={n.y - 9}
+                  width="44"
+                  height="18"
+                  fill={bg}
+                  stroke={n.hl ? accent : txt}
+                  stroke-width={n.hl ? 2 : 1}
+                  rx="2"
+                />
+                <text
+                  x={n.x}
+                  y={n.y + 3}
+                  text-anchor="middle"
+                  font-size="7"
+                  font-family="ui-monospace, monospace"
+                  fill={n.hl ? accent : txt}
+                >{n.l}</text>
+              </g>
+            ))}
+          </svg>
+          <div class="absolute bottom-2 right-3 text-[7px] uppercase tracking-wider" style={{ color: mut }}>
+            teardown 02:00 UTC
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {slug === "dockermate" && (
+    <div class="flex h-full flex-col">
+      <div
+        class="flex items-center justify-between px-3 py-2"
+        style={{ borderBottom: `1px solid ${line}` }}
+      >
+        <div class="text-[11px] font-semibold">DockerMate · 12 containers</div>
+        <div class="text-[8px]" style={{ color: mut }}>2 updates available</div>
+      </div>
+      {/* tile grid */}
+      <div class="grid flex-1 grid-cols-3 gap-2 p-3">
+        {[
+          ["gladius-api", "running", "3d 4h", true],
+          ["chroma-db", "running", "12d", false],
+          ["netbud", "running", "6h", true],
+          ["postgres-16", "running", "12d", false],
+          ["ollama", "running", "2d", false],
+          ["nginx", "exited", "—", false],
+        ].map(([n, st, up, pulse]) => (
+          <div
+            class="rounded-sm p-2"
+            style={{ border: pulse ? `1.5px solid ${accent}` : `1px solid ${line}` }}
+          >
+            <div class="flex items-center gap-1">
+              <span
+                class="h-1.5 w-1.5 rounded-full"
+                style={{ background: st === "running" ? "#7ab98a" : mut }}
+              ></span>
+              <span class="truncate text-[8.5px] font-semibold">{n}</span>
+            </div>
+            <div class="mt-1 text-[7px]" style={{ color: mut }}>up {up}</div>
+            {pulse && (
+              <div class="mt-1 text-[7px] font-semibold" style={{ color: accent }}>
+                ↑ update
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      {/* chat strip */}
+      <div
+        class="flex items-center gap-2 px-3 py-2 text-[8.5px]"
+        style={{ borderTop: `1px solid ${line}` }}
+      >
+        <span style={{ color: accent }}>●</span>
+        <span style={{ color: mut }}>"upgrade netbud" → compose_pull_service · compose_up_service ✓</span>
+      </div>
+    </div>
+  )}
+
+  {slug === "webex-migrate" && (
+    <div class="flex h-full flex-col">
+      {/* pipeline */}
+      <div
+        class="flex items-center gap-1.5 px-3 py-2"
+        style={{ background: "#fff", borderBottom: `1px solid ${line}` }}
+      >
+        {["SOURCE", "REVIEW", "WEBEX", "PUSH", "REPORTS"].map((s, i) => (
+          <>
+            <div
+              class="rounded-sm px-1.5 py-0.5 text-[7px] tracking-wider"
+              style={{
+                background: i === 3 ? accent : "transparent",
+                color: i === 3 ? "#fff" : i < 3 ? txt : mut,
+                border: i === 3 ? "none" : `1px solid ${line}`,
+              }}
+            >{s}</div>
+            {i < 4 && <span class="text-[7px]" style={{ color: mut }}>→</span>}
+          </>
+        ))}
+      </div>
+      {/* table */}
+      <div class="flex-1 overflow-hidden p-3">
+        <div
+          class="grid grid-cols-[14px_1fr_70px_50px] gap-2 pb-1 text-[7px] uppercase tracking-wider"
+          style={{ color: mut, borderBottom: `1px solid ${line}` }}
+        >
+          <span></span><span>object</span><span>type</span><span>dry-run</span>
+        </div>
+        {[
+          ["#7ab98a", "amcleod@acme.com", "person", "ready"],
+          ["#7ab98a", "+44 141 555 0142", "person", "ready"],
+          ["#d4a449", "HG-Glasgow-Sales", "hunt group", "warn"],
+          ["#7ab98a", "HG-Support-L1", "hunt group", "ready"],
+          [accent, "CPG-Floor-2", "pickup", "blocked"],
+        ].map(([dot, obj, ty, st], i) => (
+          <div
+            class="grid grid-cols-[14px_1fr_70px_50px] items-center gap-2 py-1 text-[8.5px]"
+            style={{ borderBottom: i < 4 ? `1px solid ${line}` : "none" }}
+          >
+            <span class="h-2 w-2 rounded-full" style={{ background: dot }}></span>
+            <span class="truncate">{obj}</span>
+            <span style={{ color: mut }}>{ty}</span>
+            <span style={{ color: st === "blocked" ? accent : st === "warn" ? "#d4a449" : mut }}>{st}</span>
+          </div>
+        ))}
+      </div>
+      {/* footer */}
+      <div
+        class="flex items-center justify-between px-3 py-1.5 text-[8px]"
+        style={{ background: "#fff", borderTop: `1px solid ${line}`, color: mut }}
+      >
+        <span>batch 03 · 142 ready · 7 blocked</span>
+        <span style={{ color: accent }}>rollback armed ↩</span>
       </div>
     </div>
   )}
