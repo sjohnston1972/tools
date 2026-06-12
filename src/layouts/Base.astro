@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import ChatLauncher from "../components/ChatLauncher.astro";
+import AdminBar from "../components/AdminBar.tsx";
 
 interface Props {
   title?: string;
@@ -42,5 +43,6 @@ const {
   <body class="bg-cream text-ink">
     <slot />
     <ChatLauncher />
+    <AdminBar client:idle />
   </body>
 </html>

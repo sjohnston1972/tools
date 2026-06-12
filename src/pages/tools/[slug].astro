@@ -1,10 +1,9 @@
 ---
-import fs from "node:fs";
-import path from "node:path";
 import Base from "../../layouts/Base.astro";
 import BrutalNav from "../../components/BrutalNav.astro";
 import BrutalFooter from "../../components/BrutalFooter.astro";
 import ToolMock from "../../components/ToolMock.astro";
+import ScreenshotGallery from "../../components/ScreenshotGallery.tsx";
 import { TOOLS, TOOL_BY_SLUG } from "../../data/tools";
 
 export const prerender = true;
@@ -21,21 +20,6 @@ if (!tool) {
 // next three tools, wrapping around, for the footer nav
 const idx = TOOLS.findIndex((t) => t.slug === tool.slug);
 const peers = [1, 2, 3].map((o) => TOOLS[(idx + o) % TOOLS.length]);
-
-// Page is prerendered, so this runs at build time. Only screenshots that
-// actually exist in public/screenshots/<slug>/ get rendered — visitors never
-// see empty upload slots. Up to 10, sorted by filename.
-let shots: string[] = [];
-try {
-  shots = fs
-    .readdirSync(path.resolve("public/screenshots", tool.slug))
-    .filter((f) => /\.(png|jpe?g|webp|gif|avif)$/i.test(f))
-    .sort()
-    .slice(0, 10)
-    .map((f) => `/screenshots/${tool.slug}/${f}`);
-} catch {
-  // no directory yet — section simply doesn't render
-}
 ---
 
 <Base title={`${tool.name} · Steven Johnston`} description={tool.blurb}>
@@ -119,31 +103,11 @@ try {
     </div>
   </section>
 
-  {/* screenshots — drop real captures into public/screenshots/<slug>/
-      (01.png … 10.png; jpg/webp/gif/avif also work) and redeploy. The
-      section only renders images that exist. */}
-  {shots.length > 0 && (
-    <section class="border-t border-line px-5 py-14 md:px-10 md:py-20">
-      <h2 class="text-2xl font-bold tracking-tight">Screenshots</h2>
-      <div class="mt-8 grid gap-8 md:grid-cols-2">
-        {shots.map((src, i) => (
-          <figure>
-            <div class="relative aspect-[16/10] overflow-hidden border border-line bg-cream-2">
-              <img
-                src={src}
-                alt={`${tool.name} screenshot ${i + 1}`}
-                loading="lazy"
-                class="absolute inset-0 h-full w-full object-cover object-top"
-              />
-            </div>
-            <figcaption class="mt-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted">
-              Fig. {String(i + 2).padStart(2, "0")} · {tool.name}
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-    </section>
-  )}
+  {/* screenshots — uploaded via admin mode, stored in R2, served from
+      /api/img/<slug>/. Compact strip + lightbox; renders nothing when empty
+      and not in admin mode. */}
+  <ScreenshotGallery slug={tool.slug} name={tool.name} accent={tool.color} client:idle />
+
 
   {/* outcome */}
   <section class="bg-ink px-5 py-16 text-cream md:px-10 md:py-20">

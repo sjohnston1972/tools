@@ -19,14 +19,40 @@ A small public showcase of eight AI-built tools by [Steven Johnston](https://cly
 
 Repo links are intentionally not published yet — each detail page shows a "GitHub — coming soon" placeholder.
 
-## Screenshots
+## Screenshots & admin mode
 
-Drop real captures into `public/screenshots/<slug>/` (`01.png` … `10.png`;
-`.jpg` / `.webp` / `.gif` / `.avif` also work) and redeploy. The detail page
-only renders images that exist at build time (up to 10, sorted by filename),
-so visitors never see empty placeholder slots. Slugs: `gladius`, `shellmate`,
-`cisco-api-navigator`, `parity`, `archie`, `cloudforge`, `dockermate`,
-`webex-migrate`.
+Screenshots are uploaded through the browser and stored in Cloudflare R2 (the
+`SCREENSHOTS` bucket binding, `tools-clydeford-screenshots`). Each tool's detail
+page shows a compact thumbnail strip; click any thumbnail to open a full-screen
+slideshow (arrow keys / on-screen arrows / Esc). The section renders nothing when
+a tool has no screenshots, so visitors never see empty slots.
+
+**Admin mode** is the gated upload/delete UI:
+
+- A discreet **Admin** button sits bottom-left on every page. Click it, enter the
+  PIN, and admin mode persists for the browser session (PIN held in
+  `sessionStorage` only). Click **Admin · exit** to leave.
+- In admin mode each gallery gains an "Add image" tile and a delete (✕) on each
+  thumbnail. Up to 10 per tool; PNG / JPEG / WebP / GIF / AVIF, 6 MB max.
+- The PIN is the `ADMIN_PIN` Worker secret. It is **re-validated server-side on
+  every upload and delete** — the browser-side admin flag is only UX, not
+  security. PIN attempts are rate-limited per IP via `RATE_KV`.
+
+Set or change the PIN:
+
+```bash
+npx wrangler secret put ADMIN_PIN
+```
+
+API routes (all in `src/pages/api/`):
+
+| Route | Method | Purpose |
+|---|---|---|
+| `/api/screenshots?slug=<slug>` | GET | public list of a tool's screenshots |
+| `/api/img/<slug>/<file>` | GET | stream an image from R2 |
+| `/api/admin/auth` | POST | validate a PIN (UX only) |
+| `/api/admin/upload` | POST | upload (multipart; `x-admin-pin` header) |
+| `/api/admin/delete` | POST | delete (`x-admin-pin` header) |
 
 ## Stack
 

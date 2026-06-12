@@ -22,6 +22,12 @@
       "id": "97ce0461ced949429c1c3af93f44b9b9"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "SCREENSHOTS",
+      "bucket_name": "tools-clydeford-screenshots"
+    }
+  ],
   "routes": [
     {
       "pattern": "tools.clydeford.net",

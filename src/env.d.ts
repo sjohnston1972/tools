@@ -13,4 +13,6 @@ interface Env {
   DAILY_TOKEN_BUDGET: string;
   RATE_KV: KVNamespace;
   ASSETS: Fetcher;
+  SCREENSHOTS: R2Bucket;
+  ADMIN_PIN: string;
 }
