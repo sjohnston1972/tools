@@ -12,6 +12,7 @@ interface Env {
   RATE_LIMIT_WINDOW_SECONDS: string;
   DAILY_TOKEN_BUDGET: string;
   RATE_KV: KVNamespace;
+  DB: D1Database;
   ASSETS: Fetcher;
   SCREENSHOTS: R2Bucket;
   ADMIN_PIN: string;

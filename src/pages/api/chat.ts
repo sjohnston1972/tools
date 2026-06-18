@@ -92,6 +92,19 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
     }),
   );
 
+  // Append the transcript to the shared chat-logs D1 database in the
+  // background, once the full reply has streamed. Never blocks the response.
+  if (env.DB) {
+    const site = new URL(request.url).hostname;
+    ctx.waitUntil(
+      result.fullText.then((reply) =>
+        logChat(env, site, ip, cleaned, reply).catch((e) =>
+          console.error("chat_log_error", String(e)),
+        ),
+      ),
+    );
+  }
+
   return new Response(result.body, {
     status: 200,
     headers: {
@@ -102,6 +115,38 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
     },
   });
 };
+
+/**
+ * Append this site's chat transcript to the shared `chat-logs` D1 database.
+ * One row per (site, ip): `site` is the request hostname, so no per-site
+ * config is needed. The transcript is overwritten with the latest, most
+ * complete conversation each call.
+ */
+async function logChat(
+  env: Env,
+  site: string,
+  ip: string,
+  messages: { role: string; content: string }[],
+  reply: string,
+  cta = false,
+): Promise<void> {
+  const now = new Date().toISOString();
+  const transcript = JSON.stringify({
+    messages: [...messages, { role: "assistant", content: reply }],
+    cta,
+  });
+
+  await env.DB.prepare(
+    `INSERT INTO chat_logs (site, ip, created_at, updated_at, request_count, transcript)
+     VALUES (?1, ?2, ?3, ?3, 1, ?4)
+     ON CONFLICT(site, ip) DO UPDATE SET
+       updated_at = ?3,
+       request_count = request_count + 1,
+       transcript = ?4`,
+  )
+    .bind(site, ip, now, transcript)
+    .run();
+}
 
 function json(data: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
   return new Response(JSON.stringify(data), {

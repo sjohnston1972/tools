@@ -11,6 +11,9 @@ export type DeepseekStreamResult = {
   // returns usage in the final SSE chunk when stream_options.include_usage
   // is true.
   totalTokens: Promise<number>;
+  // Resolves once the stream has finished, with the full assembled
+  // assistant reply (all deltas concatenated). Used for chat logging.
+  fullText: Promise<string>;
 };
 
 export async function streamDeepseek(
@@ -41,6 +44,9 @@ export async function streamDeepseek(
   let resolveTokens: (n: number) => void;
   const totalTokens = new Promise<number>((r) => (resolveTokens = r));
 
+  let resolveFullText: (s: string) => void;
+  const fullText = new Promise<string>((r) => (resolveFullText = r));
+
   // Pipe DeepSeek's OpenAI-style SSE through to the client as our own
   // simpler `data: <text>\n\n` stream. We strip the wrapper and emit only
   // the delta content, plus a final `event: done` marker.
@@ -52,6 +58,7 @@ export async function streamDeepseek(
     async start(controller) {
       let buf = "";
       let tokens = 0;
+      let full = "";
       try {
         while (true) {
           const { done, value } = await reader.read();
@@ -73,6 +80,7 @@ export async function streamDeepseek(
                 }
                 const delta = json.choices?.[0]?.delta?.content;
                 if (delta) {
+                  full += delta;
                   controller.enqueue(
                     encoder.encode(
                       `data: ${JSON.stringify({ t: delta })}\n\n`,
@@ -95,9 +103,10 @@ export async function streamDeepseek(
       } finally {
         controller.close();
         resolveTokens!(tokens);
+        resolveFullText!(full);
       }
     },
   });
 
-  return { body, totalTokens };
+  return { body, totalTokens, fullText };
 }
