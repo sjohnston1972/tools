@@ -35,7 +35,7 @@ export default function HeroPreview({ slug, name, accent, children }: Props) {
   const go = (delta: number) => setI((n) => n + delta);
 
   return (
-    <>
+    <div className="max-w-[760px]">
       <div className="overflow-hidden border border-line bg-cream-2">
         <div className="h-[3px]" style={{ background: accent }}></div>
         <div className="relative aspect-[16/9]">
@@ -81,6 +81,6 @@ export default function HeroPreview({ slug, name, accent, children }: Props) {
       <div className="mt-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted">
         {has ? `Fig. 01 · ${name}` : "Fig. 01 · stylised interface preview"}
       </div>
-    </>
+    </div>
   );
 }
