@@ -92,13 +92,15 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
     }),
   );
 
-  // Append the transcript to the shared chat-logs D1 database in the
-  // background, once the full reply has streamed. Never blocks the response.
+  // Append this turn to the shared chat-logs D1 database in the background,
+  // once the full reply has streamed. The helper appends to the stored
+  // transcript, so pass only the latest user message. Never blocks the response.
   if (env.DB) {
     const site = new URL(request.url).hostname;
+    const userMessage = cleaned[cleaned.length - 1].content;
     ctx.waitUntil(
       result.fullText.then((reply) =>
-        logChat(env, site, ip, cleaned, reply).catch((e) =>
+        logChat(env, site, ip, userMessage, reply).catch((e) =>
           console.error("chat_log_error", String(e)),
         ),
       ),
@@ -117,22 +119,30 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
 };
 
 /**
- * Append this site's chat transcript to the shared `chat-logs` D1 database.
- * One row per (site, ip): `site` is the request hostname, so no per-site
- * config is needed. The transcript is overwritten with the latest, most
- * complete conversation each call.
+ * Append this turn to the shared `chat-logs` D1 database. One row per
+ * (site, ip): `site` is the request hostname, so no per-site config is needed.
+ *
+ * IMPORTANT: pass ONLY the latest turn (the user's message + the assistant's
+ * reply). The helper APPENDS them to whatever is already stored, so the full
+ * conversation history accumulates server-side regardless of what the app
+ * keeps in memory.
  */
 async function logChat(
   env: Env,
   site: string,
   ip: string,
-  messages: { role: string; content: string }[],
+  userMessage: string,
   reply: string,
   cta = false,
 ): Promise<void> {
   const now = new Date().toISOString();
-  const transcript = JSON.stringify({
-    messages: [...messages, { role: "assistant", content: reply }],
+  const userMsg = JSON.stringify({ role: "user", content: userMessage });
+  const botMsg = JSON.stringify({ role: "assistant", content: reply });
+  const initial = JSON.stringify({
+    messages: [
+      { role: "user", content: userMessage },
+      { role: "assistant", content: reply },
+    ],
     cta,
   });
 
@@ -140,11 +150,18 @@ async function logChat(
     `INSERT INTO chat_logs (site, ip, created_at, updated_at, request_count, transcript)
      VALUES (?1, ?2, ?3, ?3, 1, ?4)
      ON CONFLICT(site, ip) DO UPDATE SET
-       updated_at = ?3,
+       updated_at    = ?3,
        request_count = request_count + 1,
-       transcript = ?4`,
+       transcript    = json_set(
+                         json_insert(
+                           json_insert(transcript, '$.messages[#]', json(?5)),
+                           '$.messages[#]', json(?6)
+                         ),
+                         -- keep CTA "sticky": once it fires for a visitor it stays true
+                         '$.cta', json(CASE WHEN json_extract(transcript, '$.cta') = 1 THEN 'true' ELSE ?7 END)
+                       )`,
   )
-    .bind(site, ip, now, transcript)
+    .bind(site, ip, now, initial, userMsg, botMsg, cta ? "true" : "false")
     .run();
 }
 
