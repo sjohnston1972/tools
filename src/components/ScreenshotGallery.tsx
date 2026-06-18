@@ -55,7 +55,35 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [lightbox, shots.length]);
 
-  async function upload(files: FileList) {
+  // Paste-to-upload: in admin mode, pasting image(s) from the clipboard uploads
+  // them, respecting the per-tool cap.
+  useEffect(() => {
+    if (!admin) return;
+    const onPaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const files: File[] = [];
+      for (const item of Array.from(items)) {
+        if (item.kind === "file" && item.type.startsWith("image/")) {
+          const f = item.getAsFile();
+          if (f) files.push(f);
+        }
+      }
+      if (files.length === 0) return;
+      e.preventDefault();
+      if (busy) return;
+      const room = 10 - shots.length;
+      if (room <= 0) {
+        setMsg("Limit reached (10 screenshots per tool). Delete one first.");
+        return;
+      }
+      upload(files.slice(0, room));
+    };
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [admin, busy, shots.length]);
+
+  async function upload(files: FileList | File[]) {
     const pin = getAdminPin();
     if (!pin) return;
     setBusy(true);
@@ -238,7 +266,7 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
           >
             <span className="text-2xl leading-none" style={{ color: accent }}>+</span>
             <span className="font-mono text-[10px] uppercase tracking-[0.12em]">
-              {busy ? "Uploading…" : "Add image"}
+              {busy ? "Uploading…" : "Add or paste"}
             </span>
           </button>
         )}
@@ -247,7 +275,7 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
       {admin && (
         <p className="mt-3 font-mono text-[10.5px] text-muted">
           Admin mode · {shots.length}/10 used · drag to reorder (first = hero) ·
-          PNG / JPEG / WebP / GIF / AVIF, max 6 MB
+          click + or paste (Ctrl/⌘V) to add · PNG / JPEG / WebP / GIF / AVIF, max 6 MB
         </p>
       )}
       {msg && <p className="mt-2 text-[12px] text-accent">{msg}</p>}
