@@ -145,29 +145,6 @@ const peers = [1, 2, 3].map((o) => TOOLS[(idx + o) % TOOLS.length]);
     </div>
   </section>
 
-  {/* links */}
-  <section class="border-t border-line px-5 py-12 md:px-10">
-    <div class="flex flex-wrap gap-3">
-      {tool.github ? (
-        <a
-          href={tool.github}
-          target="_blank"
-          rel="noopener"
-          class="brutal-link-cta"
-        >GitHub ↗</a>
-      ) : (
-        <span
-          class="cursor-default select-none border border-dashed border-line px-4 py-2.5 text-xs font-medium tracking-[0.04em] text-muted"
-        >GitHub · coming soon</span>
-      )}
-    </div>
-    {!tool.github && (
-      <p class="mt-4 max-w-[560px] text-[13.5px] font-medium leading-relaxed text-muted">
-        The repos are private while they get tidied for release. Ask and I'll happily walk through the code, the architecture, or a live demo.
-      </p>
-    )}
-  </section>
-
   {/* peer projects */}
   <section class="border-t border-line px-5 py-14 md:px-10">
     <h2 class="text-2xl font-bold tracking-tight">More tools</h2>
