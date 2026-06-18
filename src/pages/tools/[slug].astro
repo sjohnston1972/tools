@@ -42,15 +42,14 @@ const peers = [1, 2, 3].map((o) => TOOLS[(idx + o) % TOOLS.length]);
   </section>
 
   {/* meta strip */}
-  <section class="grid grid-cols-2 border-y border-line md:grid-cols-4">
+  <section class="grid grid-cols-1 border-y border-line sm:grid-cols-3">
     {[
       ["Context", tool.client],
-      ["Duration", tool.duration],
       ["Role", tool.role],
       ["Status", tool.status],
     ].map(([k, v], i) => (
       <div
-        class={`px-5 py-5 md:px-6 ${i % 2 === 0 ? "border-r border-line" : "md:border-r md:border-line"} ${i < 2 ? "border-b border-line md:border-b-0" : ""} ${i === 3 ? "md:!border-r-0" : ""}`}
+        class={`px-5 py-5 md:px-6 ${i < 2 ? "border-b border-line sm:border-b-0 sm:border-r" : ""}`}
       >
         <div class="brutal-eyebrow uppercase">{k}</div>
         <div class="mt-2 text-[14px] font-medium">{v}</div>
