@@ -160,10 +160,10 @@ export default function ChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`fixed bottom-5 right-5 z-50 flex items-center gap-2.5 bg-ink px-4 py-3 text-xs font-semibold tracking-[0.08em] text-cream shadow-soft transition-colors hover:bg-accent md:bottom-8 md:right-8 ${open ? "hidden" : ""}`}
+        className={`fixed bottom-5 right-5 z-50 flex items-center gap-2.5 bg-[#c2410c] px-4 py-3 text-xs font-semibold tracking-[0.08em] text-cream shadow-soft transition-colors hover:bg-[#f2670f] md:bottom-8 md:right-8 ${open ? "hidden" : ""}`}
         aria-label="Open chat"
       >
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-cream"></span>
         Ask the bot
       </button>
 
