@@ -10,7 +10,6 @@ interface Props {
 
 export default function ScreenshotGallery({ slug, name, accent }: Props) {
   const [shots, setShots] = useState<Shot[]>([]);
-  const [loaded, setLoaded] = useState(false);
   const [admin, setAdmin] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
@@ -28,14 +27,14 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
       setShots(data.images || []);
     } catch {
       setShots([]);
-    } finally {
-      setLoaded(true);
     }
   }, [slug]);
 
+  // This gallery is an admin-only management surface; the public sees
+  // screenshots through the hero panel instead. Only fetch when in admin mode.
   useEffect(() => {
-    load();
-  }, [load]);
+    if (admin) load();
+  }, [admin, load]);
 
   useEffect(() => {
     const sync = () => setAdmin(!!getAdminPin());
@@ -179,9 +178,9 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
     persistOrder(next);
   }
 
-  // Nothing to show and not managing: render nothing so the page stays tight.
-  if (loaded && shots.length === 0 && !admin) return null;
-  if (!loaded && !admin) return null;
+  // Admin-only: the public never sees this management strip (screenshots show
+  // in the hero panel instead).
+  if (!admin) return null;
 
   return (
     <section className="border-t border-line px-5 py-14 md:px-10 md:py-16">
