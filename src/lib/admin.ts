@@ -6,7 +6,7 @@ import { TOOLS } from "../data/tools";
 
 const VALID_SLUGS = new Set(TOOLS.map((t) => t.slug));
 
-export const MAX_SHOTS_PER_TOOL = 10;
+export const MAX_SHOTS_PER_TOOL = 20;
 export const MAX_BYTES = 6 * 1024 * 1024; // 6 MB
 export const ALLOWED_TYPES: Record<string, string> = {
   "image/png": "png",

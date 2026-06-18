@@ -71,9 +71,9 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
       if (files.length === 0) return;
       e.preventDefault();
       if (busy) return;
-      const room = 10 - shots.length;
+      const room = 20 - shots.length;
       if (room <= 0) {
-        setMsg("Limit reached (10 screenshots per tool). Delete one first.");
+        setMsg("Limit reached (20 screenshots per tool). Delete one first.");
         return;
       }
       upload(files.slice(0, room));
@@ -255,7 +255,7 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
           </div>
         ))}
 
-        {admin && shots.length < 10 && (
+        {admin && shots.length < 20 && (
           <button
             type="button"
             onClick={() => fileInput.current?.click()}
@@ -273,7 +273,7 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
 
       {admin && (
         <p className="mt-3 font-mono text-[10.5px] text-muted">
-          Admin mode · {shots.length}/10 used · drag to reorder (first = hero) ·
+          Admin mode · {shots.length}/20 used · drag to reorder (first = hero) ·
           click + or paste (Ctrl/⌘V) to add · PNG / JPEG / WebP / GIF / AVIF, max 6 MB
         </p>
       )}
