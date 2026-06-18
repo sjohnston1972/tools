@@ -1,6 +1,7 @@
 ---
 import type { Tool } from "../data/tools";
 import ToolMock from "./ToolMock.astro";
+import TileThumb from "./TileThumb.tsx";
 
 interface Props {
   tool: Tool;
@@ -19,8 +20,10 @@ const { tool } = Astro.props;
   </div>
 
   <div class="border-b border-line bg-cream-2 p-3.5">
-    <div class="aspect-[4/3] overflow-hidden border border-line">
-      <ToolMock slug={tool.slug} accent={tool.color} />
+    <div class="relative aspect-[4/3] overflow-hidden border border-line">
+      <TileThumb slug={tool.slug} name={tool.name} client:idle>
+        <ToolMock slug={tool.slug} accent={tool.color} />
+      </TileThumb>
     </div>
   </div>
 
