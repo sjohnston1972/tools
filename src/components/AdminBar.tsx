@@ -71,9 +71,6 @@ export default function AdminBar() {
             <div className="font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-muted">
               Admin access
             </div>
-            <p className="mt-2 text-[13px] leading-relaxed text-muted">
-              Enter your PIN to manage screenshots.
-            </p>
             <input
               type="password"
               inputMode="numeric"
