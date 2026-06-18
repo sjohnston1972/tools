@@ -34,7 +34,7 @@ export default function TileThumb({ slug, name, children }: Props) {
         src={hero}
         alt={`${name} preview`}
         loading="lazy"
-        className="absolute inset-0 h-full w-full object-cover object-top"
+        className="absolute inset-0 h-full w-full object-contain"
       />
     );
   }
