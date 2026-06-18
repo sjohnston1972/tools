@@ -15,7 +15,11 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  // Set when a drag completes so the trailing click doesn't open the lightbox.
+  const justDragged = useRef(false);
 
   const load = useCallback(async () => {
     try {
@@ -106,6 +110,47 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
     }
   }
 
+  // Persist the current order to the server. Optimistic: `next` is already
+  // shown; on failure we surface a message and reload to revert.
+  async function persistOrder(next: Shot[]) {
+    const pin = getAdminPin();
+    if (!pin) return;
+    setBusy(true);
+    setMsg(null);
+    try {
+      const res = await fetch("/api/admin/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-pin": pin },
+        body: JSON.stringify({ slug, order: next.map((s) => s.file) }),
+      });
+      const data = (await res.json()) as { images?: Shot[]; message?: string };
+      if (!res.ok) {
+        setMsg(data.message || "Could not save order.");
+        load();
+      } else if (data.images) {
+        setShots(data.images);
+      }
+    } catch {
+      setMsg("Network error.");
+      load();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function onDrop(target: number) {
+    setOverIndex(null);
+    const from = dragIndex;
+    setDragIndex(null);
+    if (from === null || from === target) return;
+    justDragged.current = true;
+    const next = [...shots];
+    const [moved] = next.splice(from, 1);
+    next.splice(target, 0, moved);
+    setShots(next);
+    persistOrder(next);
+  }
+
   // Nothing to show and not managing: render nothing so the page stays tight.
   if (loaded && shots.length === 0 && !admin) return null;
   if (!loaded && !admin) return null;
@@ -123,11 +168,35 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
 
       <div className="mt-6 flex flex-wrap gap-3">
         {shots.map((s, i) => (
-          <div key={s.file} className="group relative">
+          <div
+            key={s.file}
+            className={`group relative ${admin ? "cursor-move" : ""} ${
+              dragIndex === i ? "opacity-40" : ""
+            }`}
+            draggable={admin && !busy}
+            onDragStart={() => admin && setDragIndex(i)}
+            onDragEnter={() => admin && dragIndex !== null && setOverIndex(i)}
+            onDragOver={(e) => admin && dragIndex !== null && e.preventDefault()}
+            onDrop={() => admin && onDrop(i)}
+            onDragEnd={() => {
+              setDragIndex(null);
+              setOverIndex(null);
+            }}
+          >
             <button
               type="button"
-              onClick={() => setLightbox(i)}
-              className="block h-24 w-40 overflow-hidden border border-line bg-cream-2 transition-colors hover:border-ink"
+              onClick={() => {
+                // Suppress the click that fires at the end of a drag.
+                if (justDragged.current) {
+                  justDragged.current = false;
+                  return;
+                }
+                setLightbox(i);
+              }}
+              className={`block h-24 w-40 overflow-hidden border bg-cream-2 transition-colors hover:border-ink ${
+                overIndex === i && dragIndex !== i ? "border-accent" : "border-line"
+              }`}
+              style={overIndex === i && dragIndex !== i ? { borderColor: accent } : undefined}
               aria-label={`Enlarge screenshot ${i + 1}`}
             >
               <img
@@ -137,6 +206,14 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
                 className="h-full w-full object-cover object-top"
               />
             </button>
+            {admin && i === 0 && (
+              <span
+                className="pointer-events-none absolute left-1 top-1 bg-ink/80 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-cream"
+                style={{ background: accent }}
+              >
+                Hero
+              </span>
+            )}
             {admin && (
               <button
                 type="button"
@@ -169,7 +246,8 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
 
       {admin && (
         <p className="mt-3 font-mono text-[10.5px] text-muted">
-          Admin mode · {shots.length}/10 used · PNG / JPEG / WebP / GIF / AVIF, max 6 MB
+          Admin mode · {shots.length}/10 used · drag to reorder (first = hero) ·
+          PNG / JPEG / WebP / GIF / AVIF, max 6 MB
         </p>
       )}
       {msg && <p className="mt-2 text-[12px] text-accent">{msg}</p>}

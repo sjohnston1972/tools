@@ -91,16 +91,66 @@ export function jsonResponse(
   });
 }
 
-// List object keys for a tool, sorted (keys are timestamp-prefixed so this is
-// chronological). Returns the public serving URLs.
+// Read the admin-defined display order for a tool: an array of filenames stored
+// in KV under `order:<slug>`. Returns [] when unset or unavailable so callers
+// fall back to chronological order.
+export async function getOrder(env: Env, slug: string): Promise<string[]> {
+  if (!env.RATE_KV) return [];
+  try {
+    const raw = await env.RATE_KV.get(`order:${slug}`);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((f) => typeof f === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+// Persist the admin-defined display order. The submitted order is intersected
+// with the files actually present in R2 (dropping stale/unknown entries and
+// deduping) so the manifest never drifts from real storage.
+export async function setOrder(
+  env: Env,
+  slug: string,
+  order: string[],
+): Promise<void> {
+  if (!env.RATE_KV) return;
+  const listed = await env.SCREENSHOTS.list({ prefix: `${slug}/` });
+  const existing = new Set(
+    listed.objects.map((o) => o.key.slice(slug.length + 1)).filter(Boolean),
+  );
+  const seen = new Set<string>();
+  const clean = order.filter(
+    (f) => typeof f === "string" && !f.includes("/") && existing.has(f) && !seen.has(f) && seen.add(f),
+  );
+  await env.RATE_KV.put(`order:${slug}`, JSON.stringify(clean));
+}
+
+// List object keys for a tool. Keys are timestamp-prefixed, so the raw sort is
+// chronological; the KV order manifest (if any) then takes precedence: files
+// named in the manifest come first in manifest order, and any not yet in it
+// (e.g. fresh uploads) are appended after in chronological order. Returns the
+// public serving URLs.
 export async function listShots(
   env: Env,
   slug: string,
 ): Promise<{ file: string; url: string }[]> {
   const listed = await env.SCREENSHOTS.list({ prefix: `${slug}/` });
-  return listed.objects
+  const files = listed.objects
     .map((o) => o.key.slice(slug.length + 1))
     .filter(Boolean)
-    .sort()
-    .map((file) => ({ file, url: `/api/img/${slug}/${file}` }));
+    .sort();
+
+  const order = await getOrder(env, slug);
+  if (order.length) {
+    const rank = new Map(order.map((f, i) => [f, i]));
+    files.sort((a, b) => {
+      const ra = rank.has(a) ? rank.get(a)! : Infinity;
+      const rb = rank.has(b) ? rank.get(b)! : Infinity;
+      // Both unranked: keep chronological (already sorted, so stable tie).
+      return ra === rb ? 0 : ra - rb;
+    });
+  }
+
+  return files.map((file) => ({ file, url: `/api/img/${slug}/${file}` }));
 }
