@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import BrutalNav from "../../components/BrutalNav.astro";
 import BrutalFooter from "../../components/BrutalFooter.astro";
 import ToolMock from "../../components/ToolMock.astro";
+import HeroPreview from "../../components/HeroPreview.tsx";
 import ScreenshotGallery from "../../components/ScreenshotGallery.tsx";
 import { TOOLS, TOOL_BY_SLUG } from "../../data/tools";
 
@@ -40,19 +41,11 @@ const peers = [1, 2, 3].map((o) => TOOLS[(idx + o) % TOOLS.length]);
     </p>
   </section>
 
-  {/* hero preview */}
+  {/* hero preview — first uploaded screenshot when present, else the mock */}
   <section class="px-5 pb-12 md:px-10">
-    <div class="overflow-hidden border border-line bg-cream-2">
-      <div class="h-[3px]" style={{ background: tool.color }}></div>
-      <div class="relative aspect-[16/9]">
-        <div class="absolute inset-5 overflow-hidden border border-line md:inset-8">
-          <ToolMock slug={tool.slug} accent={tool.color} />
-        </div>
-      </div>
-    </div>
-    <div class="mt-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted">
-      Fig. 01 · stylised interface preview
-    </div>
+    <HeroPreview slug={tool.slug} name={tool.name} accent={tool.color} client:idle>
+      <ToolMock slug={tool.slug} accent={tool.color} />
+    </HeroPreview>
   </section>
 
   {/* meta strip */}
