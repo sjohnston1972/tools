@@ -2,6 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getAdminPin, onAdminChange } from "../lib/adminClient";
 
 type Shot = { file: string; url: string };
+
+// Client-side mirror of MAX_SHOTS_PER_TOOL in src/lib/admin.ts (the server
+// enforces it; keep the two in sync).
+const MAX_SHOTS_PER_TOOL = 20;
 interface Props {
   slug: string;
   name: string;
@@ -71,9 +75,9 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
       if (files.length === 0) return;
       e.preventDefault();
       if (busy) return;
-      const room = 20 - shots.length;
+      const room = MAX_SHOTS_PER_TOOL - shots.length;
       if (room <= 0) {
-        setMsg("Limit reached (20 screenshots per tool). Delete one first.");
+        setMsg(`Limit reached (${MAX_SHOTS_PER_TOOL} screenshots per tool). Delete one first.`);
         return;
       }
       upload(files.slice(0, room));
@@ -255,7 +259,7 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
           </div>
         ))}
 
-        {admin && shots.length < 20 && (
+        {admin && shots.length < MAX_SHOTS_PER_TOOL && (
           <button
             type="button"
             onClick={() => fileInput.current?.click()}
@@ -273,7 +277,7 @@ export default function ScreenshotGallery({ slug, name, accent }: Props) {
 
       {admin && (
         <p className="mt-3 font-mono text-[10.5px] text-muted">
-          Admin mode · {shots.length}/20 used · drag to reorder (first = hero) ·
+          Admin mode · {shots.length}/{MAX_SHOTS_PER_TOOL} used · drag to reorder (first = hero) ·
           click + or paste (Ctrl/⌘V) to add · PNG / JPEG / WebP / GIF / AVIF, max 6 MB
         </p>
       )}

@@ -22,21 +22,27 @@ Repo links are intentionally not published yet — each detail page shows a "Git
 ## Screenshots & admin mode
 
 Screenshots are uploaded through the browser and stored in Cloudflare R2 (the
-`SCREENSHOTS` bucket binding, `tools-clydeford-screenshots`). Each tool's detail
-page shows a compact thumbnail strip; click any thumbnail to open a full-screen
-slideshow (arrow keys / on-screen arrows / Esc). The section renders nothing when
-a tool has no screenshots, so visitors never see empty slots.
+`SCREENSHOTS` bucket binding, `tools-clydeford-screenshots`). **Visitors** see
+them in two places: the hero panel on each tool's detail page (`HeroPreview`,
+which shows the first-ordered screenshot and falls back to the stylised mock
+when a tool has none) and the homepage tool tiles (`TileThumb`). There is no
+public thumbnail strip.
 
-**Admin mode** is the gated upload/delete UI:
+**Admin mode** is the gated management UI:
 
 - A discreet **Admin** button sits bottom-left on every page. Click it, enter the
   PIN, and admin mode persists for the browser session (PIN held in
   `sessionStorage` only). Click **Admin · exit** to leave.
-- In admin mode each gallery gains an "Add image" tile and a delete (✕) on each
-  thumbnail. Up to 10 per tool; PNG / JPEG / WebP / GIF / AVIF, 6 MB max.
+- In admin mode each detail page gains a **Screenshots** management strip
+  (`ScreenshotGallery` — it renders nothing for non-admins): an "Add or paste"
+  tile (click, or Ctrl/⌘V an image from the clipboard), a delete (✕) on each
+  thumbnail, a click-to-enlarge lightbox, and **drag-to-reorder** — the first
+  screenshot is the hero image shown to visitors. Order is persisted as a KV
+  manifest via `/api/admin/reorder`. Up to 20 per tool; PNG / JPEG / WebP /
+  GIF / AVIF, 6 MB max.
 - The PIN is the `ADMIN_PIN` Worker secret. It is **re-validated server-side on
-  every upload and delete** — the browser-side admin flag is only UX, not
-  security. PIN attempts are rate-limited per IP via `RATE_KV`.
+  every upload, delete, and reorder** — the browser-side admin flag is only UX,
+  not security. PIN attempts are rate-limited per IP via `RATE_KV`.
 
 Set or change the PIN:
 
@@ -48,11 +54,13 @@ API routes (all in `src/pages/api/`):
 
 | Route | Method | Purpose |
 |---|---|---|
+| `/api/chat` | POST | streaming DeepSeek chat endpoint (SSE) |
 | `/api/screenshots?slug=<slug>` | GET | public list of a tool's screenshots |
 | `/api/img/<slug>/<file>` | GET | stream an image from R2 |
 | `/api/admin/auth` | POST | validate a PIN (UX only) |
 | `/api/admin/upload` | POST | upload (multipart; `x-admin-pin` header) |
 | `/api/admin/delete` | POST | delete (`x-admin-pin` header) |
+| `/api/admin/reorder` | POST | save screenshot display order (index 0 = hero) |
 
 ## Stack
 
@@ -80,19 +88,31 @@ Conversations **are** logged server-side: after each reply streams, the Worker a
 ```
 .
 ├── astro.config.mjs       # Astro 5 + Cloudflare adapter + React + Tailwind
-├── wrangler.jsonc         # Worker config + custom domain + RATE_KV binding
+├── wrangler.jsonc         # Worker config + custom domain + KV / D1 / R2 bindings
 ├── tailwind.config.mjs    # brutalist design tokens
+├── schema/
+│   └── chat_logs.sql      # local-only D1 schema (production table already exists)
+├── seed-chatlogs.sql      # synthetic test rows for the chat_logs table
+├── wrangler_instructions.txt  # how other sites plug into the shared chat-logs DB
 ├── src/
 │   ├── pages/
 │   │   ├── index.astro            # landing page (hero, tool tiles, process, stack, footer)
 │   │   ├── tools/[slug].astro     # one detail page per tool, prerendered
-│   │   └── api/chat.ts            # streaming DeepSeek endpoint
+│   │   └── api/
+│   │       ├── chat.ts            # streaming DeepSeek endpoint + D1 chat logging
+│   │       ├── screenshots.ts     # public screenshot list
+│   │       ├── img/[slug]/[file].ts   # stream an image from R2
+│   │       └── admin/             # auth.ts, upload.ts, delete.ts, reorder.ts
 │   ├── components/
 │   │   ├── BrutalNav.astro
 │   │   ├── BrutalFooter.astro
 │   │   ├── Marquee.astro
 │   │   ├── ToolTile.astro
 │   │   ├── ToolMock.astro         # stylised fake-screenshot mocks per tool
+│   │   ├── AdminBar.tsx           # bottom-left PIN entry / admin toggle
+│   │   ├── HeroPreview.tsx        # hero screenshot panel (public)
+│   │   ├── TileThumb.tsx          # homepage tile thumbnails (public)
+│   │   ├── ScreenshotGallery.tsx  # admin-only management strip (upload/reorder/delete)
 │   │   ├── ChatLauncher.astro     # mounts the React island
 │   │   └── ChatWidget.tsx         # React chat widget (SSE consumer + suggestions)
 │   ├── data/
@@ -101,9 +121,14 @@ Conversations **are** logged server-side: after each reply streams, the Worker a
 │   ├── lib/
 │   │   ├── systemPrompt.ts        # assembles the strict on-topic prompt
 │   │   ├── deepseek.ts            # OpenAI-compatible streaming wrapper
-│   │   └── rateLimit.ts           # KV-backed per-IP + daily-budget checks
+│   │   ├── rateLimit.ts           # KV-backed per-IP + daily-budget checks
+│   │   ├── chatLog.ts             # transcript append/trim, IP hashing, retention
+│   │   ├── admin.ts               # server-side PIN gate + screenshot order manifest
+│   │   └── adminClient.ts         # browser-side admin session state
 │   ├── layouts/Base.astro
-│   └── styles/global.css
+│   ├── styles/global.css
+│   └── env.d.ts           # Env interface (secrets + bindings)
+├── tests/                 # vitest unit tests (chatLog, rateLimit, admin)
 ├── public/                # robots.txt and any future static assets
 ├── design templates/      # the original Claude Design HTML exports — design source of truth
 └── README.md
