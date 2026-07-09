@@ -10,44 +10,79 @@
   ]
 
   ▎ No migration needed — the table already exists. Don't run d1 migrations apply from other projects against this
-  ▎ shared DB.
+  ▎ shared DB. (For local dev only, this repo ships schema/chat_logs.sql.)
 
-  2. Add DB to your Env interface
+  2. Add DB (and the optional salt secret) to your Env interface
 
   interface Env {
     // ...your existing bindings...
     DB: D1Database;
+    LOG_SALT?: string; // npx wrangler secret put LOG_SALT
   }
 
-  3. The helper — paste into your Worker
+  3. The helpers — paste into your Worker
+
+  const MAX_LOGGED_MESSAGES = 100; // cap per row; D1 strings max out ~2 MB
+  const RETENTION_DAYS = 90;
+
+  // Salted hash of the visitor IP, truncated to 16 hex chars. Store this as
+  // the row key instead of the raw address — it only needs to group turns
+  // from the same visitor, never to be reversed.
+  async function pseudonymizeIp(ip: string, salt?: string): Promise<string> {
+    const data = new TextEncoder().encode(`${salt || "tools-clydeford-chatlog"}:${ip}`);
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+      .slice(0, 16);
+  }
 
   /**
    * Append this turn to the shared `chat-logs` D1 database. One row per
-   * (site, ip): `site` is the request hostname, so no per-site config is needed.
+   * (site, ipKey): `site` is the request hostname, `ipKey` comes from
+   * pseudonymizeIp above.
    *
-   * IMPORTANT: pass ONLY the latest turn (the user's message + the assistant's
-   * reply). The helper APPENDS them to whatever is already stored, so the full
-   * conversation history accumulates server-side regardless of what your app
-   * keeps in memory. Do NOT pass the whole history — that's not needed and the
-   * old overwrite-based helper lost everything but the last turn.
+   * Pass ONLY the latest turn (the user's message + the assistant's reply).
+   * The helper reads the stored transcript, appends both messages, and trims
+   * to the last MAX_LOGGED_MESSAGES entries so a chatty visitor's row can
+   * never hit D1's ~2 MB string limit. The cta flag stays sticky: once true
+   * for a visitor it stays true. A read-modify-write race between two
+   * concurrent turns from the same visitor loses one turn — acceptable here.
    */
   async function logChat(
     env: Env,
     site: string,
-    ip: string,
+    ipKey: string,
     userMessage: string,
     reply: string,
     cta = false,
   ): Promise<void> {
     const now = new Date().toISOString();
-    const userMsg = JSON.stringify({ role: "user", content: userMessage });
-    const botMsg = JSON.stringify({ role: "assistant", content: reply });
-    const initial = JSON.stringify({
+    const row = await env.DB.prepare(
+      `SELECT transcript FROM chat_logs WHERE site = ?1 AND ip = ?2`,
+    )
+      .bind(site, ipKey)
+      .first<{ transcript: string }>();
+
+    let prev: { messages: { role: string; content: string }[]; cta: boolean } =
+      { messages: [], cta: false };
+    if (row?.transcript) {
+      try {
+        const parsed = JSON.parse(row.transcript);
+        if (parsed && Array.isArray(parsed.messages)) {
+          prev = { messages: parsed.messages, cta: parsed.cta === true };
+        }
+      } catch {
+        // corrupted row: start fresh
+      }
+    }
+    const transcript = JSON.stringify({
       messages: [
+        ...prev.messages,
         { role: "user", content: userMessage },
         { role: "assistant", content: reply },
-      ],
-      cta,
+      ].slice(-MAX_LOGGED_MESSAGES),
+      cta: prev.cta || cta,
     });
 
     await env.DB.prepare(
@@ -56,36 +91,40 @@
        ON CONFLICT(site, ip) DO UPDATE SET
          updated_at    = ?3,
          request_count = request_count + 1,
-         transcript    = json_set(
-                           json_insert(
-                             json_insert(transcript, '$.messages[#]', json(?5)),
-                             '$.messages[#]', json(?6)
-                           ),
-                           -- keep CTA "sticky": once it fires for a visitor it stays true
-                           '$.cta', json(CASE WHEN json_extract(transcript, '$.cta') = 1 THEN 'true' ELSE ?7 END)
-                         )`,
+         transcript    = excluded.transcript`,
     )
-      .bind(site, ip, now, initial, userMsg, botMsg, cta ? "true" : "false")
+      .bind(site, ipKey, now, transcript)
       .run();
+
+    // Opportunistic retention sweep (~1 in 50 turns). D1 has no TTL; scope the
+    // delete to YOUR site — the DB is shared.
+    if (Math.random() < 0.02) {
+      const cutoff = new Date(Date.now() - RETENTION_DAYS * 86_400_000).toISOString();
+      await env.DB.prepare(
+        `DELETE FROM chat_logs WHERE site = ?1 AND updated_at < ?2`,
+      )
+        .bind(site, cutoff)
+        .run();
+    }
   }
 
   4. Call it from your chat handler
 
-  Just before you return the reply to the client:
+  Just after you kick off the reply to the client:
 
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const site = new URL(request.url).hostname;
   ctx.waitUntil(
-    logChat(env, site, ip, userMessage, reply, cta).catch((e) =>
-      console.error("chat_log_error", String(e)),
-    ),
+    (async () => {
+      const ipKey = await pseudonymizeIp(ip, env.LOG_SALT);
+      await logChat(env, site, ipKey, userMessage, reply, cta);
+    })().catch((e) => console.error("chat_log_error", String(e))),
   );
 
   - userMessage = the single user message for THIS turn. reply = the assistant's reply for this turn. The helper appends
-    both to the stored transcript, so history builds up automatically. If your site doesn't track a cta flag, omit the
+    both to the stored transcript (bounded to the last 100 messages). If your site doesn't track a cta flag, omit the
     last arg — it defaults to false (and once true, it stays true for that visitor).
-  - `json_insert(..., '$.messages[#]', json(...))` is SQLite's append-to-array idiom; D1's SQLite supports it.
   - ctx.waitUntil runs the write after the response is sent, so logging never blocks or breaks the chat. Your handler
     needs access to ctx — it's the third arg of fetch(request, env, ctx), so thread it through to your handler.
-  - NOTE: rows written by the old overwrite helper already lost their earlier turns; history accumulates from the moment
-    you deploy this version. New (site, ip) conversations record in full immediately.
+  - Disclose the logging in your site's UI/docs: rows are keyed by a salted IP hash, capped at 100 messages, and pruned
+    after ~90 days by the opportunistic sweep above.

@@ -9,6 +9,7 @@
     "preview": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "astro": "astro",
+    "test": "vitest run",
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "vitest": "^4.1.10",
     "wrangler": "^4.87.0"
   }
 }

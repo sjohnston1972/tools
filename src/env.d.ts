@@ -16,4 +16,7 @@ interface Env {
   ASSETS: Fetcher;
   SCREENSHOTS: R2Bucket;
   ADMIN_PIN: string;
+  // Optional secret salting the chat-log IP hash; a static fallback is used
+  // when unset. Set with: npx wrangler secret put LOG_SALT
+  LOG_SALT?: string;
 }

@@ -6,6 +6,7 @@ import {
   checkDailyBudget,
   recordTokenUsage,
 } from "../../lib/rateLimit";
+import { appendTurn, pseudonymizeIp, retentionCutoff } from "../../lib/chatLog";
 
 export const prerender = false;
 
@@ -93,17 +94,18 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
   );
 
   // Append this turn to the shared chat-logs D1 database in the background,
-  // once the full reply has streamed. The helper appends to the stored
-  // transcript, so pass only the latest user message. Never blocks the response.
+  // once the full reply has streamed. The row is keyed by a salted hash of the
+  // visitor IP, never the raw address. Never blocks the response.
   if (env.DB) {
     const site = new URL(request.url).hostname;
     const userMessage = cleaned[cleaned.length - 1].content;
     ctx.waitUntil(
-      result.fullText.then((reply) =>
-        logChat(env, site, ip, userMessage, reply).catch((e) =>
-          console.error("chat_log_error", String(e)),
-        ),
-      ),
+      result.fullText
+        .then(async (reply) => {
+          const ipKey = await pseudonymizeIp(ip, env.LOG_SALT);
+          await logChat(env, site, ipKey, userMessage, reply);
+        })
+        .catch((e) => console.error("chat_log_error", String(e))),
     );
   }
 
@@ -120,31 +122,29 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
 
 /**
  * Append this turn to the shared `chat-logs` D1 database. One row per
- * (site, ip): `site` is the request hostname, so no per-site config is needed.
- *
- * IMPORTANT: pass ONLY the latest turn (the user's message + the assistant's
- * reply). The helper APPENDS them to whatever is already stored, so the full
- * conversation history accumulates server-side regardless of what the app
- * keeps in memory.
+ * (site, ipKey), where `ipKey` is a salted hash of the visitor IP — raw
+ * addresses are never stored. Pass ONLY the latest turn; the stored transcript
+ * is trimmed to the last MAX_LOGGED_MESSAGES entries so a row can never grow
+ * unbounded. A read-modify-write race between two concurrent turns from the
+ * same visitor is acceptable for this site.
  */
 async function logChat(
   env: Env,
   site: string,
-  ip: string,
+  ipKey: string,
   userMessage: string,
   reply: string,
   cta = false,
 ): Promise<void> {
   const now = new Date().toISOString();
-  const userMsg = JSON.stringify({ role: "user", content: userMessage });
-  const botMsg = JSON.stringify({ role: "assistant", content: reply });
-  const initial = JSON.stringify({
-    messages: [
-      { role: "user", content: userMessage },
-      { role: "assistant", content: reply },
-    ],
-    cta,
-  });
+  const row = await env.DB.prepare(
+    `SELECT transcript FROM chat_logs WHERE site = ?1 AND ip = ?2`,
+  )
+    .bind(site, ipKey)
+    .first<{ transcript: string }>();
+  const transcript = JSON.stringify(
+    appendTurn(row?.transcript ?? null, userMessage, reply, cta),
+  );
 
   await env.DB.prepare(
     `INSERT INTO chat_logs (site, ip, created_at, updated_at, request_count, transcript)
@@ -152,17 +152,20 @@ async function logChat(
      ON CONFLICT(site, ip) DO UPDATE SET
        updated_at    = ?3,
        request_count = request_count + 1,
-       transcript    = json_set(
-                         json_insert(
-                           json_insert(transcript, '$.messages[#]', json(?5)),
-                           '$.messages[#]', json(?6)
-                         ),
-                         -- keep CTA "sticky": once it fires for a visitor it stays true
-                         '$.cta', json(CASE WHEN json_extract(transcript, '$.cta') = 1 THEN 'true' ELSE ?7 END)
-                       )`,
+       transcript    = excluded.transcript`,
   )
-    .bind(site, ip, now, initial, userMsg, botMsg, cta ? "true" : "false")
+    .bind(site, ipKey, now, transcript)
     .run();
+
+  // Opportunistic retention sweep (~1 in 50 turns): the shared DB has no TTL,
+  // so normal traffic prunes this site's rows past the retention window.
+  if (Math.random() < 0.02) {
+    await env.DB.prepare(
+      `DELETE FROM chat_logs WHERE site = ?1 AND updated_at < ?2`,
+    )
+      .bind(site, retentionCutoff(new Date()))
+      .run();
+  }
 }
 
 function json(data: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
