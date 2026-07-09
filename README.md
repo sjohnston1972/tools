@@ -138,22 +138,60 @@ Conversations **are** logged server-side: after each reply streams, the Worker a
 
 ```bash
 npm install
-echo "DEEPSEEK_API_KEY=sk-..." > .dev.vars
-npm run dev          # Astro dev server on localhost:4321
 ```
 
-Or to run inside the actual Workers runtime (KV bindings, secrets, the lot):
+Create a `.dev.vars` file in the repo root with **both** secrets (plus the
+optional log salt):
+
+```ini
+DEEPSEEK_API_KEY=sk-...   # chat; without it /api/chat returns 500
+ADMIN_PIN=1234            # screenshot admin mode; without it every admin call
+                          # returns "Admin mode is not configured."
+LOG_SALT=any-random-string  # optional; salts the chat-log IP hash
+```
+
+Then run either:
 
 ```bash
-npm run preview      # builds + wrangler dev
+npm run dev          # Astro dev server on localhost:4321
+npm run preview      # builds + wrangler dev — the actual Workers runtime
+```
+
+Both emulate the Cloudflare bindings **locally and empty**: no screenshots in
+R2, no rate-limit state in KV, and no `chat_logs` table in D1 until you create
+it. Initialize the local D1 (needed once, or chat logging fails silently with
+`chat_log_error ... no such table` in the wrangler dev output):
+
+```bash
+npx wrangler d1 execute chat-logs --local --file schema/chat_logs.sql
+npx wrangler d1 execute chat-logs --local --file seed-chatlogs.sql   # optional test rows
+```
+
+> **⚠️ Never run the schema or seed with `--remote`.** The production
+> `chat-logs` D1 database is shared across several of the owner's sites and
+> already has the table.
+
+Other useful scripts:
+
+```bash
+npm run check        # astro check (typecheck)
+npm test             # vitest unit tests
 ```
 
 ## Deployment
 
 ```bash
-# one-time
-npx wrangler kv namespace create RATE_KV    # paste the id into wrangler.jsonc
+# one-time provisioning
+npx wrangler kv namespace create RATE_KV                      # paste the id into wrangler.jsonc
+npx wrangler r2 bucket create tools-clydeford-screenshots     # R2 bucket for screenshots
+# D1: the shared `chat-logs` database already exists on the owner's account
+# (id in wrangler.jsonc). On a fresh account: npx wrangler d1 create chat-logs,
+# update the id, and apply schema/chat_logs.sql to it.
+
+# one-time secrets
 echo "<deepseek-key>" | npx wrangler secret put DEEPSEEK_API_KEY
+echo "<pin>"          | npx wrangler secret put ADMIN_PIN
+echo "<random-salt>"  | npx wrangler secret put LOG_SALT      # optional
 
 # every deploy
 npm run deploy       # runs astro build + wrangler deploy
