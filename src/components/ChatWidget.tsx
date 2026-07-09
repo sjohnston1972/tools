@@ -80,11 +80,10 @@ export default function ChatWidget() {
       });
 
       if (!res.ok) {
+        // Errors are transient UI state, never conversation turns: they must
+        // not persist to localStorage or replay to the model as history.
         const body = await res.json().catch(() => ({ message: `HTTP ${res.status}` }));
-        setMessages((m) => [
-          ...m,
-          { role: "assistant", content: body.message ?? `Error: HTTP ${res.status}` },
-        ]);
+        setError(body.message ?? `Error: HTTP ${res.status}`);
         return;
       }
       if (!res.body) {
@@ -144,6 +143,14 @@ export default function ChatWidget() {
     } finally {
       setStreaming(false);
       abortRef.current = null;
+      // Drop an assistant bubble that never received a token (failed stream)
+      // so it doesn't linger as an eternal "…" placeholder.
+      setMessages((m) => {
+        const last = m[m.length - 1];
+        return last && last.role === "assistant" && last.content === ""
+          ? m.slice(0, -1)
+          : m;
+      });
     }
   }
 
