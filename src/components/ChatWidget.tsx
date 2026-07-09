@@ -218,7 +218,8 @@ export default function ChatWidget() {
                 <div className="space-y-3">
                   <p className="text-[13.5px] leading-relaxed text-muted">
                     Powered by DeepSeek. Strictly on topic: Steven and his eight tools.
-                    Conversations are not stored on the server.
+                    Chats may be logged server-side (pseudonymously, no raw IPs) to
+                    improve the site.
                   </p>
                   <div className="space-y-1.5">
                     {SUGGESTIONS.map((s) => (

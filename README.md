@@ -73,7 +73,7 @@ If someone hammers the chat:
 - **Per-IP**: 15 messages per 10 minutes, then a witty cooldown ("somebody is battering the cr@p out of Steven's API credits…").
 - **Global**: 300,000 DeepSeek tokens per UTC day, then everyone gets a cooldown until midnight UTC.
 
-Conversations are anonymous. Nothing is persisted server-side; the browser keeps the last 30 turns in `localStorage`.
+Conversations **are** logged server-side: after each reply streams, the Worker appends the turn (user message + assistant reply) to a `chat_logs` table in a shared Cloudflare D1 database (`DB` binding) via `ctx.waitUntil`, so logging never blocks the response. Rows are keyed by site + a salted SHA-256 hash of the visitor IP (truncated to 16 hex chars — the raw address is never stored; salt is the optional `LOG_SALT` secret). Each row's transcript is capped at the last 100 messages, and rows older than ~90 days are pruned opportunistically by normal traffic. The browser separately keeps the last 30 turns in `localStorage`.
 
 ## Project layout
 
