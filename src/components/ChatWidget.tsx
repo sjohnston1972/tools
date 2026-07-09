@@ -82,8 +82,8 @@ export default function ChatWidget() {
       if (!res.ok) {
         // Errors are transient UI state, never conversation turns: they must
         // not persist to localStorage or replay to the model as history.
-        const body = await res.json().catch(() => ({ message: `HTTP ${res.status}` }));
-        setError(body.message ?? `Error: HTTP ${res.status}`);
+        const body = (await res.json().catch(() => null)) as { message?: string } | null;
+        setError(body?.message ?? `Error: HTTP ${res.status}`);
         return;
       }
       if (!res.body) {

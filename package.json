@@ -9,6 +9,7 @@
     "preview": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "astro": "astro",
+    "check": "astro check",
     "test": "vitest run",
     "cf-typegen": "wrangler types"
   },
@@ -22,8 +23,10 @@
     "tailwindcss": "^3.4.18"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "typescript": "^5.9.3",
     "vitest": "^4.1.10",
     "wrangler": "^4.87.0"
   }

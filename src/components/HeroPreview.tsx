@@ -22,8 +22,8 @@ export default function HeroPreview({ slug, name, accent, children }: Props) {
   useEffect(() => {
     let active = true;
     fetch(`/api/screenshots?slug=${encodeURIComponent(slug)}`)
-      .then((r) => r.json())
-      .then((d: { images?: Shot[] }) => {
+      .then((r) => r.json() as Promise<{ images?: Shot[] }>)
+      .then((d) => {
         if (active && d.images) setShots(d.images);
       })
       .catch(() => {});

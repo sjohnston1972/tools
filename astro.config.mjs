@@ -8,8 +8,8 @@ export default defineConfig({
   output: "server",
   adapter: cloudflare({
     platformProxy: { enabled: true },
-    // We don't use Astro sessions on this site, so don't auto-bind a SESSION KV.
-    sessionKVBindingName: false,
+    // Astro sessions are never used on this site, so the default SESSION KV
+    // binding is intentionally absent from wrangler.jsonc.
   }),
   integrations: [
     react(),

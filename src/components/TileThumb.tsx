@@ -18,8 +18,8 @@ export default function TileThumb({ slug, name, children }: Props) {
   useEffect(() => {
     let active = true;
     fetch(`/api/screenshots?slug=${encodeURIComponent(slug)}`)
-      .then((r) => r.json())
-      .then((d: { images?: Shot[] }) => {
+      .then((r) => r.json() as Promise<{ images?: Shot[] }>)
+      .then((d) => {
         if (active && d.images && d.images.length > 0) setHero(d.images[0].url);
       })
       .catch(() => {});

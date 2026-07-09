@@ -142,7 +142,7 @@ const filter = dim ? "brightness(0.6) saturate(0.7)" : "none";
             ["10.0.0.2", "1", "FULL/DR", "10.0.0.2"],
             ["10.0.0.3", "1", "FULL/BDR", "10.0.0.3"],
             ["10.0.0.4", "1", "INIT/DROTHER", "10.0.0.4"],
-          ].map(([id, pri, st, ad], i) => (
+          ].map(([id, pri, st, ad]) => (
             <div class="whitespace-pre">
               {id.padEnd(15)}{pri.padEnd(6)}<span style={{ color: st === "INIT/DROTHER" ? accent : "#7ab98a" }}>{st.padEnd(15)}</span>{ad}
             </div>
